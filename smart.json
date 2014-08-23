@@ -1,0 +1,12 @@
+{
+  "name": "data",
+  "description": "Schema/model system for wrapping logic around documents.",
+  "homepage": "",
+  "author": "",
+  "version": "0.0.1",
+  "git": "",
+  "packages": {
+    "sugar": {},
+    "munit": {}
+  }
+}
