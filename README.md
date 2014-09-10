@@ -11,7 +11,7 @@ When running for the first time:
 
 # Run Tests
 
-    mrt test-packages model -p 1234
+    mrt test-packages data -p 1234
 
 
 
