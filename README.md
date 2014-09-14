@@ -2,20 +2,20 @@
 Schema/model system for wrapping logic around documents.
 
 
-# Installation
+## Installation
 When running for the first time:
 
     mrt update
     package update
 
 
-# Run Tests
+## Run Tests
 
     mrt test-packages data -p 1234
 
 
 
-# License (MIT)
+## License (MIT)
 
 Copyright © 2014, **Respondly**
 
