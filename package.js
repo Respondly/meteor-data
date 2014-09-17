@@ -30,15 +30,15 @@ Package.on_test(function (api) {
 
   // Generated with: github.com/philcockfield/meteor-package-paths
   api.add_files('tests/shared/_init.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/model/document-model.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/model/model-factory.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/model/model-ref.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/model/model-refs-collection.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/model/model.coffee', ['client', 'server']);
+  api.add_files('tests/shared/model/document-model.coffee', ['client', 'server']);
+  api.add_files('tests/shared/model/model-factory.coffee', ['client', 'server']);
+  api.add_files('tests/shared/model/model-ref.coffee', ['client', 'server']);
+  api.add_files('tests/shared/model/model-refs-collection.coffee', ['client', 'server']);
+  api.add_files('tests/shared/model/model.coffee', ['client', 'server']);
   api.add_files('tests/shared/samples/samples.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/schema/schema-hasOne.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/schema/schema-model-ref.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/schema/schema-types.coffee', ['client', 'server']);
-  // api.add_files('tests/shared/schema/schema.coffee', ['client', 'server']);
+  api.add_files('tests/shared/schema/schema-hasOne.coffee', ['client', 'server']);
+  api.add_files('tests/shared/schema/schema-model-ref.coffee', ['client', 'server']);
+  api.add_files('tests/shared/schema/schema-types.coffee', ['client', 'server']);
+  api.add_files('tests/shared/schema/schema.coffee', ['client', 'server']);
 
 });
