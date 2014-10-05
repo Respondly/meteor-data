@@ -10,11 +10,6 @@
       "data": {
         "path": "."
       },
-      "sugar": {
-        "git": "https://github.com/bevanhunt/meteor-sugar.git",
-        "tag": "v0.1.7",
-        "commit": "eef2d45055fabeb27c003f39bb36b97a361b4455"
-      },
       "munit": {
         "git": "https://github.com/spacejamio/meteor-munit.git",
         "tag": "v0.2.0",

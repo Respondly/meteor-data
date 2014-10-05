@@ -29,7 +29,6 @@ class RefModel extends Data.Model
 
 
 describe 'Model-refs', ->
-
   it 'has a referenced model instance, from direct Type reference', ->
     root = new RootModel()
     expect(root.refByType).to.be.an.instanceOf RefModel

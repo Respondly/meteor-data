@@ -35,6 +35,7 @@ Package.on_test(function (api) {
   api.add_files('tests/shared/model/model-ref.coffee', ['client', 'server']);
   api.add_files('tests/shared/model/model-refs-collection.coffee', ['client', 'server']);
   api.add_files('tests/shared/model/model.coffee', ['client', 'server']);
+  api.add_files('tests/shared/samples/samples.coffee', ['client', 'server']);
   api.add_files('tests/shared/schema/schema-hasOne.coffee', ['client', 'server']);
   api.add_files('tests/shared/schema/schema-model-ref.coffee', ['client', 'server']);
   api.add_files('tests/shared/schema/schema-types.coffee', ['client', 'server']);
