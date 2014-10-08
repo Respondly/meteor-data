@@ -56,7 +56,7 @@ describe 'Check: simple checks (calibrate tests)', ->
 
 
 
-describe 'Check: root model changes', ->
+describe 'Match: root model changes', ->
   beforeEach -> initModels()
 
   it 'pass: from <undefined> to String', ->
@@ -64,46 +64,96 @@ describe 'Check: root model changes', ->
     changes = model.changes()
 
     changeMatch = Data.match.changes(foo:String)
-    # expect(Match.test(changes, changeMatch)).to.equal true
+    expect(Match.test(changes, changeMatch)).to.equal true
 
-#   it 'pass: from <undefined> to String or Boolean', ->
-#     model.foo(true)
-#     changes = model.changes()
-#     changeMatch = Data.match.changes(foo:Match.OneOf(String, Boolean))
-#     expect(Match.test(changes, changeMatch)).to.equal true
-
-
-#   it 'fail: from <undefined> to String', ->
-#     model.foo(true)
-#     changes = model.changes()
-#     changeMatch = Data.match.changes(foo:String)
-#     expect(Match.test(changes, changeMatch)).to.equal false
-
-#   it 'fail: from <undefined> to String or Boolean', ->
-#     model.foo(123)
-#     changes = model.changes()
-#     changeMatch = Data.match.changes(foo:Match.OneOf(String, Boolean))
-#     expect(Match.test(changes, changeMatch)).to.equal false
+  it 'pass: from <undefined> to String or Boolean', ->
+    model.foo(true)
+    changes = model.changes()
+    changeMatch = Data.match.changes(foo:Match.OneOf(String, Boolean))
+    expect(Match.test(changes, changeMatch)).to.equal true
 
 
-# describe 'sub-model', ->
-#   it 'pass: from <undefined> to String or Boolean on sub-model', ->
-#     model.subModel.name('Foo')
-#     changes = model.changes()
-#     def =
-#       subModel:
-#         name: Match.OneOf(String, Boolean)
-#     changeMatch = Data.match.changes(def)
-#     expect(Match.test(changes, changeMatch)).to.equal true
+  it 'fail: from <undefined> to String', ->
+    model.foo(true)
+    changes = model.changes()
+    changeMatch = Data.match.changes(foo:String)
+    expect(Match.test(changes, changeMatch)).to.equal false
 
-#   it 'fail: from <undefined> to String or Boolean on sub-model', ->
-#     model.subModel.name(123)
-#     changes = model.changes()
-#     def =
-#       subModel:
-#         name: Match.OneOf(String, Boolean)
-#     changeMatch = Data.match.changes(def)
-#     expect(Match.test(changes, changeMatch)).to.equal false
+  it 'fail: from <undefined> to String or Boolean', ->
+    model.foo(123)
+    changes = model.changes()
+    changeMatch = Data.match.changes(foo:Match.OneOf(String, Boolean))
+    expect(Match.test(changes, changeMatch)).to.equal false
+
+
+# ----------------------------------------------------------------------
+
+
+describe 'Match: sub-model', ->
+  beforeEach -> initModels()
+
+  it 'pass: from <undefined> to String or Boolean on sub-model', ->
+    model.subModel.name('Foo')
+    changes = model.changes()
+    def =
+      subModel:
+        name: Match.OneOf(String, Boolean)
+    changeMatch = Data.match.changes(def)
+    expect(Match.test(changes, changeMatch)).to.equal true
+
+  it 'fail: from <undefined> to String or Boolean on sub-model', ->
+    model.subModel.name(123)
+    changes = model.changes()
+    def =
+      subModel:
+        name: Match.OneOf(String, Boolean)
+    changeMatch = Data.match.changes(def)
+    expect(Match.test(changes, changeMatch)).to.equal false
+
+
+
+# ----------------------------------------------------------------------
+
+
+
+describe 'Data.check.changes', ->
+  beforeEach -> initModels()
+
+  it 'passes', ->
+    model.foo(true)
+    model.subModel.name('Foo')
+    changes = model.changes()
+
+    Data.check.changes changes,
+      foo: Boolean
+      subModel:
+        name: String
+
+
+  it 'fails on on root model', ->
+    model.foo('String')
+    model.subModel.name('Foo')
+    changes = model.changes()
+    fn = ->
+        Data.check.changes changes,
+          foo: Boolean
+          subModel:
+            name: String
+    expect(fn).to.throw(/Failed Match/)
+
+
+  it 'fails on on sub model', ->
+    model.foo(true)
+    model.subModel.name(123)
+    changes = model.changes()
+    fn = ->
+        Data.check.changes changes,
+          foo: Boolean
+          subModel:
+            name: String
+    expect(fn).to.throw(/Failed Match/)
+
+
 
 
 
