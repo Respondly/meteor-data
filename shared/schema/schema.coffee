@@ -1,3 +1,6 @@
+#= require ../ns.js
+
+
 ###
 Base class for model Schema's
 ###

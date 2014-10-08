@@ -1,3 +1,4 @@
+#= require ../ns.js
 #= base
 
 instanceCount = 0
