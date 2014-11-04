@@ -16,7 +16,8 @@ class Data.SubModel extends Data.Model
   ###
   update: ->
     parent = @_parent
-    parent.model.updateFields( parent.field )
+    parent.model.updateFields(parent.field)
+
 
 
 

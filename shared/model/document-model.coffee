@@ -74,7 +74,7 @@ Data.DocumentModel = class DocumentModel extends Model
     @id     = newId
 
     # Finish up.
-    delete @_changeSet
+    @__internal__.changeStore?.clear?()
     @
 
 
@@ -202,19 +202,19 @@ Data.DocumentModel = class DocumentModel extends Model
   saveChanges: -> @syncChanges(@changes(), save:true)
 
 
+  ###
+  OVERRIDE
+  ###
+  changes: (options = {}) ->
+    # Persist changes between hot-code pushes on the client.
+    if Meteor.isClient and @id?
+      @__internal__.changeStore = @session()
+    super
 
-  # PRIVATE METHODS ----------------------------------------------------------------
-
-
-  # OVERRIDE - Store change sets in a session object (on the client)
-  _changes: (value) ->
-    if Meteor.isServer or not @id?
-      super value # No session object on the server.
-    else
-      @session().prop 'changes', value, default:null
 
 
 # PRIVATE --------------------------------------------------------------------------
+
 
 
 beforeSaveFilter = (model, field, value) ->

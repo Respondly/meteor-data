@@ -43,11 +43,10 @@ class Data.FieldDefinition
 
 
   ###
-  Savely generates a new default value.
+  Safely generates a new default value.
   ###
   createDefault: ->
     value = @default
-    # return if value is undefined
     return value() if Object.isFunction(value)
     return value.clone() if Object.isArray(value)
     value

@@ -36,6 +36,8 @@ initStubs = ->
 
 # Tests --------------------------------------------------------
 
+
+
 describe 'Model.isModelType (class property)', ->
   ParentModel = null
   ChildModel = null
@@ -170,7 +172,6 @@ describe 'fields', ->
   it 'sets default values on document via method', ->
     stub = new Foo()
     expect(stub._doc).to.eql {}
-
     stub.setDefaultValues()
     doc = stub._doc
     expect(doc.parent).to.equal 123
@@ -637,6 +638,15 @@ describe 'Model [changes] method', ->
     stub.foo 'new-foo'
     stub.foo 123 # Revert to the original value.
     expect(stub.changes()).to.equal null
+
+  it 'has reactive changes on Model', (done) ->
+    changes = undefined
+    Deps.autorun -> changes = stub.changes()
+    stub.foo 'new-foo'
+    Util.delay =>
+      @try =>
+        expect(changes.foo.to).to.equal 'new-foo'
+      done()
 
 
 describe '[revertChanges] method', ->

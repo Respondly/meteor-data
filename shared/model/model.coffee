@@ -69,7 +69,7 @@ Data.Model = class Model extends AutoRun
       if field.hasDefault()
         existingValue = field.read(@_doc, useDefault:false)
         if existingValue is undefined
-          @[key]( field.createDefault() )
+          @[key](field.createDefault())
 
     # Finish up.
     @
@@ -86,7 +86,7 @@ Data.Model = class Model extends AutoRun
 
 
   ###
-  Gets or sets changed values.
+  REACTIVE: Gets or sets changed values.
   @returns options
               - field:  (optional) When writing, the field that has changed.
               - value:  (optional) When writing, the new value of the changed field.  Pass [undefined] to remove.
@@ -94,11 +94,15 @@ Data.Model = class Model extends AutoRun
                         should be cleared (default:false).
 
   @returns an object containing [fields:values] that have changed,
-           or [undefined] if there have been no changes.
+           or [null] if there have been no changes.
   ###
   changes: (options = {}) ->
+
+    reactiveStore = @__internal__.changeStore ?= new ReactiveHash()
+
     read = =>
-        result = @_changes()
+        # result = (@__internal__.changeSet ? null)
+        result = reactiveStore.get('changes') ? null
 
         for key, value of result
             # Clean out any empty objects (from sub-models).
@@ -109,12 +113,41 @@ Data.Model = class Model extends AutoRun
         return null if result and Object.isEmpty(result)
         return result
 
+
+    write = (value) =>
+
+        if value isnt undefined
+          # WRITE.
+
+          reactiveStore.set 'changes', value
+
+          if value is null
+            # The value is being deleted.
+            # delete @__internal__.changeSet
+            if @isSubModel()
+              # Delete this sub-model's reference in the parent change-set too.
+              delete @_parent.model.changes()?[@_parent.field.key]
+
+          # @__internal__.changeSet = value
+          # if @__internal__.changeSet is null
+          #   # The value is being deleted.
+          #   delete @__internal__.changeSet
+          #   if @isSubModel()
+          #     # Delete this sub-model's reference in the parent change-set too.
+          #     delete @_parent.model._changes()?[@_parent.field.key]
+
+
+
+        # console.log '@', @
+        # @_changes(value)
+
+
     # Read operation (if no options were specified).
     return read() if Object.isEmpty(options)
 
     # Clear value.
     if options.clear
-      @_changes(null)
+      write(null)
       return null
 
     # Write value.
@@ -160,7 +193,7 @@ Data.Model = class Model extends AutoRun
 
       # Store the change-set.
       changes = null if Object.isEmpty(changes)
-      @_changes(changes)
+      write(changes)
 
     # Finish up.
     read()
@@ -196,26 +229,9 @@ Data.Model = class Model extends AutoRun
 
 
 
-  # PRIVATE METHODS -----------------------------------------------------------------
-
-
-  _changes: (value) ->
-    if value isnt undefined
-      # WRITE.
-      @_changeSet = value
-      if @_changeSet is null
-        # The value is being deleted.
-        delete @_changeSet
-        if @isSubModel()
-          # Delete this sub-model's reference in the parent change-set too.
-          delete @_parent.model._changes()?[@_parent.field.key]
-
-    # READ.
-    @_changeSet ? null
-
-
 
 # CLASS METHODS -----------------------------------------------------------------
+
 
 Model.isModelType = true # Flag used to identify the type.
 

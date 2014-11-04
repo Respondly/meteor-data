@@ -192,7 +192,7 @@ describe 'DocumentModel: [changes] method', ->
   it 'stores changes for unsaved models (in memory, not session)', ->
     stub = new Stub()
     stub.foo 'abc'
-    expect(stub._changeSet).to.eql { foo:{to:'abc', from:123} }
+    expect(stub.__internal__.changeStore.get('changes')).to.eql { foo:{to:'abc', from:123} }
 
   it.client 'stores changes in session object', ->
     stub = new Stub().insertNew()
@@ -202,9 +202,10 @@ describe 'DocumentModel: [changes] method', ->
   it 'clears change-set on [insertNew]', ->
     stub = new Stub()
     stub.foo 'abc'
-    expect(stub._changeSet.foo.to).to.eql 'abc'
+    expect(stub.__internal__.changeStore.get('changes').foo.to).to.eql 'abc'
     stub.insertNew()
-    expect(stub._changeSet).to.equal undefined
+    stub.changes()
+    expect(stub.__internal__.changeStore.get('changes')).to.equal undefined
 
   it 'stores changed values', ->
     stub.foo 'my-foo'
