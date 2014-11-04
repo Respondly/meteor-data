@@ -48,43 +48,37 @@ describe 'SubModel: Changes', ->
     expect(subModel.changes().name.from).to.equal undefined
     expect(subModel.changes().name.to).to.equal 'Phil'
 
-  it 'has changes on parent model', ->
+  it 'has changes on parent-model', ->
     subModel.name('Phil')
     expect(model.changes().subModel.name.from).to.equal undefined
     expect(model.changes().subModel.name.to).to.equal 'Phil'
 
-  # it 'reactively changes parent model', (done) ->
-  #   changes = undefined
-  #   Deps.autorun ->
-  #       console.log '|| run'
-  #       changes = model.changes()
 
-  #   model.text('Foo')
-  #   subModel.name('Phil')
-
-  #   console.log 'model.changes()', model.changes()
+# ----------------------------------------------------------------------
 
 
-  #   Util.delay 500, =>
-  #     @try =>
+describe 'SubModel: Changes (Reactive)', ->
+  beforeEach -> initModels()
 
-  #       console.log 'changes', changes
+  it 'reactively changes sub-model', (done) ->
+    changes = undefined
+    Deps.autorun -> changes = subModel.changes()
+    subModel.name('Phil')
+    Util.delay =>
+      @try =>
+        expect(changes.name.from).to.equal undefined
+        expect(changes.name.to).to.equal 'Phil'
+      done()
 
-  #       # console.log 'model.changes()', model.changes()
-  #       console.log '||changes', changes
-  #       console.log 'changes.subModel', changes.subModel
-  #       console.log 'changes.subModel.name', changes.subModel.name
-  #       console.log 'changes.subModel.from', changes.subModel.name.from
-  #       console.log 'changes.subModel.to', changes.subModel.name.to
-  #       console.log ''
-
-  #       # expect(changes.subModel.name.from).to.equal undefined
-  #       # expect(changes.subModel.name.to).to.equal 'Phil'
-
-
-
-
-  #     done()
+  it 'reactively changes parent-model', (done) ->
+    changes = undefined
+    Deps.autorun -> changes = model.changes()
+    subModel.name('Phil')
+    Util.delay =>
+      @try =>
+        expect(changes.subModel.name.from).to.equal undefined
+        expect(changes.subModel.name.to).to.equal 'Phil'
+      done()
 
 
 

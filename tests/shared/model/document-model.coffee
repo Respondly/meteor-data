@@ -159,7 +159,6 @@ describe 'DocumentModel: [insertNew] method', ->
     stub.insertNew()
     expect(stub.createdAt()).to.eql stub.updatedAt()
 
-
   it 'stores [createdAt] and [updatedAt] as integers', ->
     stub = new Foo().insertNew()
     expect(Object.isNumber(stub._doc.createdAt)).to.equal true
