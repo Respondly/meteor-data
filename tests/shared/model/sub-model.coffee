@@ -17,7 +17,7 @@ initModels = ->
 
   class MySubSchema extends Data.Schema
     constructor: -> super
-      name: undefined
+      name: 'My Name'
 
 
 
@@ -41,16 +41,16 @@ describe 'SubModel: Changes', ->
   beforeEach -> initModels()
 
   it 'does not have changes', ->
-    expect(subModel.name()).to.equal undefined
+    expect(subModel.name()).to.equal 'My Name'
 
   it 'has changes on sub-model', ->
     subModel.name('Phil')
-    expect(subModel.changes().name.from).to.equal undefined
+    expect(subModel.changes().name.from).to.equal 'My Name'
     expect(subModel.changes().name.to).to.equal 'Phil'
 
   it 'has changes on parent-model', ->
     subModel.name('Phil')
-    expect(model.changes().subModel.name.from).to.equal undefined
+    expect(model.changes().subModel.name.from).to.equal 'My Name'
     expect(model.changes().subModel.name.to).to.equal 'Phil'
 
 
@@ -66,9 +66,29 @@ describe 'SubModel: Changes (Reactive)', ->
     subModel.name('Phil')
     Util.delay =>
       @try =>
-        expect(changes.name.from).to.equal undefined
+        expect(changes.name.from).to.equal 'My Name'
         expect(changes.name.to).to.equal 'Phil'
       done()
+
+  it 'reactively reverts changes sub-model', (done) ->
+    changes = undefined
+    Deps.autorun -> changes = subModel.changes()
+    subModel.name('Phil')
+    Util.delay =>
+      Util.delay =>
+        expect(changes.name.to).to.equal 'Phil'
+        subModel.revertChanges()
+        Util.delay =>
+          @try =>
+            expect(changes).to.equal null
+          done()
+
+
+# ----------------------------------------------------------------------
+
+
+describe 'SubModel: Parent Model Changes (Reactive)', ->
+  beforeEach -> initModels()
 
   it 'reactively changes parent-model', (done) ->
     changes = undefined
@@ -76,9 +96,22 @@ describe 'SubModel: Changes (Reactive)', ->
     subModel.name('Phil')
     Util.delay =>
       @try =>
-        expect(changes.subModel.name.from).to.equal undefined
+        expect(changes.subModel.name.from).to.equal 'My Name'
         expect(changes.subModel.name.to).to.equal 'Phil'
       done()
+
+
+  it 'reactively reverts changes parent-model', (done) ->
+    changes = undefined
+    Deps.autorun -> changes = model.changes()
+    subModel.name('Phil')
+    Util.delay =>
+      Util.delay =>
+        subModel.revertChanges()
+        Util.delay =>
+          @try =>
+            expect(changes).to.equal null
+          done()
 
 
 

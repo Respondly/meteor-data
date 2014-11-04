@@ -101,7 +101,6 @@ Data.Model = class Model extends AutoRun
     reactiveStore = @__internal__.changeStore ?= new ReactiveHash()
 
     read = =>
-        # result = (@__internal__.changeSet ? null)
         result = reactiveStore.get('changes') ? null
 
         for key, value of result
@@ -115,32 +114,14 @@ Data.Model = class Model extends AutoRun
 
 
     write = (value) =>
-
         if value isnt undefined
           # WRITE.
-
           reactiveStore.set 'changes', value
-
           if value is null
             # The value is being deleted.
-            # delete @__internal__.changeSet
             if @isSubModel()
               # Delete this sub-model's reference in the parent change-set too.
               delete @_parent.model.changes()?[@_parent.field.key]
-
-          # @__internal__.changeSet = value
-          # if @__internal__.changeSet is null
-          #   # The value is being deleted.
-          #   delete @__internal__.changeSet
-          #   if @isSubModel()
-          #     # Delete this sub-model's reference in the parent change-set too.
-          #     delete @_parent.model._changes()?[@_parent.field.key]
-
-
-
-        # console.log '@', @
-        # @_changes(value)
-
 
     # Read operation (if no options were specified).
     return read() if Object.isEmpty(options)
