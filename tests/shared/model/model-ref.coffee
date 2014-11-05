@@ -70,7 +70,6 @@ describe 'Model-refs: [changes] method', ->
     stub = new RootModel()
     stub.refByTypeFunc.bar 'new-value'
     stub.refByTypeFunc.baz 123
-
     changes = stub.changes()
     expect(changes.refByTypeFunc.bar.to).to.equal 'new-value'
     expect(changes.refByTypeFunc.baz.to).to.equal 123

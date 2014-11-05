@@ -78,11 +78,7 @@ Data.Model = class Model extends AutoRun
   ###
   Determines whether this is a sub-model.
   ###
-  isSubModel: ->
-    if parent = @__internal__.parent
-      (parent?.field instanceof Data.FieldDefinition)
-    else
-      false
+  isSubModel: -> (@parentField instanceof Data.FieldDefinition)
 
 
   ###
@@ -121,8 +117,7 @@ Data.Model = class Model extends AutoRun
             # The value is being deleted.
             if @isSubModel()
               # Delete this sub-model's reference in the parent change-set too.
-              parent = @__internal__.parent
-              delete parent.model.changes()?[parent.field.key]
+              delete @parentModel.changes()?[@parentField.key]
 
 
     # Read operation (if no options were specified).
@@ -411,9 +406,8 @@ applyModelRefs = (model, options = {}) ->
         instance = new instance(doc)
 
       # Store the model-ref parent details.
-      instance.__internal__.parent ?=
-        model: model
-        field: value
+      instance.parentModel = model
+      instance.parentField = value
 
       # Assign the property-function.
       assign model, key, instance, options
@@ -423,8 +417,9 @@ applyModelRefs = (model, options = {}) ->
 fnField = (field, model) ->
   fn = (value, options = {}) ->
           # Setup initial conditions.
-          doc    = model._doc
-          parent = model.__internal__.parent
+          doc = model._doc
+          parentModel = model.parentModel
+          parentField = model.parentField
 
           # Write value.
           if value isnt undefined
@@ -438,7 +433,7 @@ fnField = (field, model) ->
             # do a comparison with the change-set.
             if not hasChanged
               if @isSubModel()
-                changeSetField = parent.model.changes()?[parent.field.key]?[field.key]
+                changeSetField = parentModel.changes()?[parentField.key]?[field.key]
               else
                 changeSetField = @changes()?[field.key]
 
@@ -452,7 +447,7 @@ fnField = (field, model) ->
               changes = model.changes( key:field.key, value:value )
               if model.isSubModel()
                 # This is a sub-model, register changes on the parent.
-                parent.model.changes( key:parent.field.key, value:changes )
+                parentModel.changes( key:parentField.key, value:changes )
 
             # Perform the write.
             field.write(doc, value)
@@ -470,7 +465,7 @@ fnField = (field, model) ->
               else
                 if parent?.model.updateFields?
                   # This is a sub-document model. Update on the parent.
-                  parent.model.updateFields?(parent.field)
+                  parentModel.updateFields?(parentField)
 
           # Read value.
           #   - Example:

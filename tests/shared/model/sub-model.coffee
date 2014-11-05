@@ -49,11 +49,11 @@ describe 'SubModel', ->
 
 
   it 'has [parentModel]', ->
-    expect(subModel.parentModel()).to.equal model
+    expect(subModel.parentModel).to.equal model
 
 
   it 'has [parentField]', ->
-    expect(subModel.parentField().key).to.equal 'subModel'
+    expect(subModel.parentField.key).to.equal 'subModel'
 
 
 
