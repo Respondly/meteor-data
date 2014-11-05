@@ -21,7 +21,7 @@ Data.Model = class Model extends AutoRun
     instanceCount += 1
     @_instance     = instanceCount
     @_schema       = schema
-    @_init( doc )
+    @_init(doc)
 
 
   _init: (doc) ->
@@ -29,11 +29,11 @@ Data.Model = class Model extends AutoRun
     unless @fields
       # First time initialization.
       if @_schema?
-        applySchema( @ ) if @_schema?
-        applyModelRefs( @, overwrite:false )
+        applySchema(@) if @_schema?
+        applyModelRefs(@, overwrite:false)
     else
       # This is a refresh of the document.
-      applyModelRefs( @, overwrite:true )
+      applyModelRefs(@, overwrite:true)
 
 
 
@@ -79,7 +79,7 @@ Data.Model = class Model extends AutoRun
   Determines whether this is a sub-model.
   ###
   isSubModel: ->
-    if parent = @_parent
+    if parent = @__internal__.parent
       (parent?.field instanceof Data.FieldDefinition)
     else
       false
@@ -121,7 +121,9 @@ Data.Model = class Model extends AutoRun
             # The value is being deleted.
             if @isSubModel()
               # Delete this sub-model's reference in the parent change-set too.
-              delete @_parent.model.changes()?[@_parent.field.key]
+              parent = @__internal__.parent
+              delete parent.model.changes()?[parent.field.key]
+
 
     # Read operation (if no options were specified).
     return read() if Object.isEmpty(options)
@@ -401,7 +403,7 @@ applyModelRefs = (model, options = {}) ->
 
       # Assign an instance of the referenced model.
       # NB: Assumes the first parameter of the constructor is the document.
-      doc      = Util.ns.get( model._doc, value.field )
+      doc      = Util.ns.get(model._doc, value.field)
       instance = new value.modelRef(doc)
 
       # Check if the function returns the Type (rather than the instance).
@@ -409,7 +411,7 @@ applyModelRefs = (model, options = {}) ->
         instance = new instance(doc)
 
       # Store the model-ref parent details.
-      instance._parent ?= # Don't overrite an existing value.
+      instance.__internal__.parent ?=
         model: model
         field: value
 
@@ -422,7 +424,7 @@ fnField = (field, model) ->
   fn = (value, options = {}) ->
           # Setup initial conditions.
           doc    = model._doc
-          parent = model._parent
+          parent = model.__internal__.parent
 
           # Write value.
           if value isnt undefined
@@ -436,7 +438,7 @@ fnField = (field, model) ->
             # do a comparison with the change-set.
             if not hasChanged
               if @isSubModel()
-                changeSetField = @_parent.model.changes()?[@_parent.field.key]?[field.key]
+                changeSetField = parent.model.changes()?[parent.field.key]?[field.key]
               else
                 changeSetField = @changes()?[field.key]
 
@@ -468,7 +470,7 @@ fnField = (field, model) ->
               else
                 if parent?.model.updateFields?
                   # This is a sub-document model. Update on the parent.
-                  parent.model.updateFields?( parent.field )
+                  parent.model.updateFields?(parent.field)
 
           # Read value.
           #   - Example:

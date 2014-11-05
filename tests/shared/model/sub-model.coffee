@@ -37,6 +37,28 @@ initModels = ->
 
 
 
+describe 'SubModel', ->
+  beforeEach -> initModels()
+
+  it 'is [isSubModel]', ->
+    expect(subModel.isSubModel()).to.equal true
+
+
+  it 'is not [isSubModel]', ->
+    expect(model.isSubModel()).to.equal false
+
+
+  it 'has [parentModel]', ->
+    expect(subModel.parentModel()).to.equal model
+
+
+  it 'has [parentField]', ->
+    expect(subModel.parentField().key).to.equal 'subModel'
+
+
+
+
+
 describe 'SubModel: Changes', ->
   beforeEach -> initModels()
 
