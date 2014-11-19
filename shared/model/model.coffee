@@ -255,7 +255,13 @@ Model.revertChanges = (model) ->
     changes = Object.clone(changes)
     for key, change of changes
       if Object.isFunction(model[key])
-        model[key](change.from) # Update the member function with the original value.
+        # Update the member function with the original value.
+        from = change.from
+        if from is undefined
+          model[key].delete() # NB: This is required because writing [undefined] to
+                              #     the property function is equivalent to a read operation.
+        else
+          model[key](change.from)
 
       if (model[key] instanceof Data.Model)
         Model.revertChanges(model[key]) # <= RECURSION : update the sub-document.

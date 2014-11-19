@@ -4,6 +4,7 @@ class MySchema extends Data.Schema
   constructor: -> super
     foo: 123
     bar: 'abc'
+    nothing: undefined
 
 
 class Stub extends Data.Model
@@ -34,4 +35,22 @@ describe '[revertChanges] method', ->
 
   it 'returns null when there are no changes to revert', ->
     expect(stub.revertChanges()).to.equal null
+
+
+  it 'reverts to undefined', ->
+    expect(stub.nothing()).to.equal undefined
+    stub.nothing(123)
+    expect(stub.nothing()).to.equal 123
+
+    # debugger
+    stub.revertChanges()
+
+    console.log 'stub.nothing()', stub.nothing()
+    console.log 'stub._doc', stub._doc
+
+    expect(stub.nothing()).to.equal undefined
+
+
+
+
 
