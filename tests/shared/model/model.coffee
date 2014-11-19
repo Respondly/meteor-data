@@ -649,30 +649,6 @@ describe 'Model [changes] method', ->
       done()
 
 
-describe '[revertChanges] method', ->
-  stub = null
-  beforeEach -> stub = new Stub()
-
-  it 'reverts a changes back to [null] changes', ->
-    stub.foo('a')
-    stub.child('b')
-    changes = stub.changes()
-    expect(changes).not.to.equal null
-    stub.revertChanges()
-
-
-  it 'returns the change-set in the the state it was prior to the revert', ->
-    stub.foo('a')
-    result = stub.revertChanges()
-    expect(result.foo.to).to.equal 'a'
-    expect(result.foo.from).to.equal 123
-    expect(stub.changes()).to.equal null
-
-  it 'returns null when there are no changes to revert', ->
-    expect(stub.revertChanges()).to.equal null
-
-
-
 
 describe '[syncChanges] method', ->
   stub1 = null
