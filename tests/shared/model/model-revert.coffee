@@ -41,13 +41,7 @@ describe '[revertChanges] method', ->
     expect(stub.nothing()).to.equal undefined
     stub.nothing(123)
     expect(stub.nothing()).to.equal 123
-
-    # debugger
     stub.revertChanges()
-
-    console.log 'stub.nothing()', stub.nothing()
-    console.log 'stub._doc', stub._doc
-
     expect(stub.nothing()).to.equal undefined
 
 
