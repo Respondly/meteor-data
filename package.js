@@ -32,6 +32,7 @@ Package.on_test(function (api) {
   // Generated with: github.com/philcockfield/meteor-package-paths
   api.add_files('tests/shared/_init.coffee', ['client', 'server']);
   api.add_files('tests/shared/model/document-model.coffee', ['client', 'server']);
+  api.add_files('tests/shared/model/model-changes.coffee', ['client', 'server']);
   api.add_files('tests/shared/model/model-factory.coffee', ['client', 'server']);
   api.add_files('tests/shared/model/model-ref.coffee', ['client', 'server']);
   api.add_files('tests/shared/model/model-refs-collection.coffee', ['client', 'server']);

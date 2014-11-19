@@ -84,16 +84,24 @@ Data.Model = class Model extends AutoRun
   ###
   REACTIVE: Gets or sets changed values.
   @returns options
-              - field:  (optional) When writing, the field that has changed.
-              - value:  (optional) When writing, the new value of the changed field.  Pass [undefined] to remove.
-              - clear:  (optional) Flag indicating if changed values
-                        should be cleared (default:false).
+              - key:    (optional)  When writing, the key of the field that has changed.
+
+              - value:  (optional)  When writing, the new value of the changed field.  Pass [undefined] to remove.
+
+              - delete: (optional)  When writing, a key of the field that should be set to [undefined].
+
+              - clear:  (optional)  Flag indicating if changed values
+                                    should be cleared (default:false).
 
   @returns an object containing [fields:values] that have changed,
            or [null] if there have been no changes.
   ###
   changes: (options = {}) ->
+    # Ensure both a write and a delete operation are not being asked for.
+    if options.delete? and options.key?
+      throw new Error('Cannot do both write and delete.')
 
+    # The reactive object that changes are stored within.
     reactiveStore = @__internal__.changeStore ?= new ReactiveHash()
 
     read = =>
@@ -119,20 +127,25 @@ Data.Model = class Model extends AutoRun
               # Delete this sub-model's reference in the parent change-set too.
               delete @parentModel.changes()?[@parentField.key]
 
-
     # Read operation (if no options were specified).
     return read() if Object.isEmpty(options)
 
     # Clear value.
-    if options.clear
+    if options.clear is true
       write(null)
       return null
 
     # Write value.
-    if key = options.key
+    isDelete = options.delete?
+    key = options.key ? options.delete
+
+    if key
       changes = read() ? {}
-      value   = options.value
-      value   = Util.clone(value)
+      if isDelete
+        value = undefined
+      else
+        value   = options.value
+        value   = Util.clone(value)
 
       if (@[key] instanceof Model)
         # This is a sub-model.
@@ -450,10 +463,10 @@ fnField = (field, model) ->
 
             # Store a reference to the change ("is dirty").
             if hasChanged
-              changes = model.changes( key:field.key, value:value )
+              changes = model.changes(key:field.key, value:value)
               if model.isSubModel()
                 # This is a sub-model, register changes on the parent.
-                parentModel.changes( key:parentField.key, value:changes )
+                parentModel.changes(key:parentField.key, value:changes)
 
             # Perform the write.
             field.write(doc, value)
@@ -489,6 +502,8 @@ fnField = (field, model) ->
 fnDelete = (field) ->
   ->
     field.delete(@model._doc)
+    @model.changes(delete:field.key)
+
 
 
 

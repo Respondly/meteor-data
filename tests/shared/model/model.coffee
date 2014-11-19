@@ -19,8 +19,9 @@ initStubs = ->
           default: 123
           field: 'custom.path'
 
-        mappedShallow: { field: 'shallow',    default:123 }
-        mappedDeep:    { field: 'deep.to.path',  default:123 }
+        mappedShallow:  { field: 'shallow',    default:123 }
+        mappedDeep:     { field: 'deep.to.path',  default:123 }
+        mappedUndefined: { field: 'deep.to.undefined',  default:undefined }
 
 
     class ChildSchema extends ParentSchema
@@ -368,6 +369,14 @@ describe 'fields', ->
     expect(stub.mappedDeep().foo).to.equal 'abc'
 
 
+# ----------------------------------------------------------------------
+
+
+describe 'Deleting field values (setting to undefined)', ->
+  class Foo extends Data.Model
+    constructor: (doc) ->
+      super doc, ChildSchema
+
   it 'deletes the attribute (shallow path)', ->
     stub = new Foo()
     stub.child 'my-value'
@@ -375,12 +384,33 @@ describe 'fields', ->
     stub.child.delete()
     expect(stub._doc.child).to.equal undefined
 
+
+  it 'deletes to undefined (shallow path)', ->
+    stub = new Foo()
+    expect(stub.noDefault()).to.equal undefined
+    stub.noDefault('foo')
+    expect(stub.noDefault()).to.equal 'foo'
+    stub.noDefault.delete()
+    expect(stub.noDefault()).to.equal undefined
+
+
   it 'deletes the attribute (deep path)', ->
     stub = new Foo()
     stub.mappedDeep 'abc'
     expect(stub._doc.deep.to.path).not.to.equal undefined
     stub.mappedDeep.delete()
     expect(stub._doc.deep.to.path).to.equal undefined
+
+
+  it 'deletes to undefined (deep path)', ->
+    stub = new Foo()
+    stub.mappedUndefined 'abc'
+    expect(stub._doc.deep.to.undefined).not.to.equal undefined
+    stub.mappedUndefined.delete()
+    expect(stub._doc.deep.to.undefined).to.equal undefined
+
+
+# ----------------------------------------------------------------------
 
 
 describe 'Property filters (read) - via function attached to the field', ->
@@ -562,124 +592,4 @@ describe 'Write filters - via function on derived model', ->
     expect(field.key).to.equal 'foo'
     expect(value).to.equal 'hello'
     expect(options).to.eql { hasChanged:true }
-
-
-
-
-describe 'Model [changes] method', ->
-  stub = null
-  beforeEach -> stub = new Stub()
-
-  it 'has no changes by default', ->
-    expect(stub.changes()).to.equal null
-
-  it 'stores changed [to] values', ->
-    stub.foo 'my-foo'
-    stub.child 'my-child'
-    expect(stub.changes().foo.to).to.equal 'my-foo'
-    expect(stub.changes().child.to).to.equal 'my-child'
-
-  it 'stores changed [from] value', ->
-    expect(stub.foo()).to.equal 123
-    stub.foo 'a'
-    stub.foo 'b' # Ensure that multile changes do not alter the original changed-[from] value.
-    expect(stub.changes().foo.to).to.equal 'b'
-    expect(stub.changes().foo.from).to.equal 123
-
-  it 'reports a change when storing arrays of objects', ->
-    value1 = [ { email: 'favstar_bot26@favstar.fm', name: null } ]
-    value2 = [ { email: 'favstar_bot26@favstar.fm', name: 'favstar_bot26' } ]
-
-    stub.foo(value1)
-    stub.changes(clear:true)
-
-    stub.foo(value2)
-    expect(stub.changes().foo.from).to.eql value1
-    expect(stub.changes().foo.to).to.eql value2
-
-
-
-  it 'stores last value', ->
-    stub.foo 1
-    stub.foo 2
-    expect(stub.changes().foo.to).to.equal 2
-
-  it 'stores null (as the changed value)', ->
-    stub.foo 1
-    stub.foo null
-    expect(stub.changes().foo.to).to.equal null
-
-  it 'clears changes', ->
-    stub.foo 1
-    stub.changes(clear:true)
-    expect(stub.changes()).to.equal null
-
-  it 'returns the "changes" value from a write operation', ->
-    result = stub.changes(key:'foo', value:456)
-    expect(result.foo.to).to.equal 456
-    expect(result.foo.from).to.equal 123
-
-  it 'does not store a change if the value is the same', ->
-    expect(stub.foo()).to.equal 123
-    stub.foo 123 # Write the current value to the model.
-    expect(stub.changes()).to.be.equal null
-
-  it 'removes the changed value when set back to original', ->
-    expect(stub.foo()).to.equal 123
-    stub.foo 'new-foo'
-    stub.child 'new-child' # Include second property change so that we don't have the whole change object be returned as [undefined]
-
-    expect(stub.changes().foo.to).to.equal 'new-foo'
-    stub.foo 123 # Revert to the original value.
-    expect(stub.changes().foo).to.equal undefined
-
-  it 'clears all changes when set back to original values', ->
-    expect(stub.foo()).to.equal 123
-    stub.foo 'new-foo'
-    stub.foo 123 # Revert to the original value.
-    expect(stub.changes()).to.equal null
-
-  it 'has reactive changes on Model', (done) ->
-    changes = undefined
-    Deps.autorun -> changes = stub.changes()
-    stub.foo 'new-foo'
-    Util.delay =>
-      @try =>
-        expect(changes.foo.to).to.equal 'new-foo'
-      done()
-
-
-
-describe '[syncChanges] method', ->
-  stub1 = null
-  stub2 = null
-  beforeEach ->
-    stub1 = new Stub()
-    stub2 = new Stub()
-
-  it 'changes values', ->
-    stub1.parent 'my-value1'
-    stub1.child  'my-value2'
-    expect(stub2.parent()).not.to.equal 'my-value1'
-    expect(stub2.child()).not.to.equal 'my-value2'
-
-    Data.Model.syncChanges( stub2, stub1.changes() )
-
-    expect(stub2.parent()).to.equal 'my-value1'
-    expect(stub2.child()).to.equal 'my-value2'
-
-  it 'returns the changed field definitions', ->
-    stub1.parent 'my-value1'
-    stub1.child  'my-value2'
-
-    fields = Data.Model.syncChanges( stub2, stub1.changes() )
-
-    expect(fields.length).to.equal 2
-    expect(fields[0].key).to.equal 'parent'
-    expect(fields[1].key).to.equal 'child'
-
-
-
-
-
 
