@@ -57,6 +57,8 @@ describe 'Model.isModelType (class property)', ->
     expect(Foo.isModelType).not.to.equal true
 
 
+# ----------------------------------------------------------------------
+
 
 describe 'construction and disposal', ->
   beforeEach -> initStubs()
@@ -77,6 +79,8 @@ describe 'construction and disposal', ->
     stub.dispose()
     expect(stub.isDisposed).to.equal true
 
+
+# ----------------------------------------------------------------------
 
 
 describe 'Schema', ->
@@ -115,6 +119,9 @@ describe 'Schema', ->
     foo = new Foo()
     expect(foo.fields).to.equal 'hello'
 
+
+
+# ----------------------------------------------------------------------
 
 
 describe 'fields', ->
@@ -472,6 +479,9 @@ describe 'Property filters (read) - via function on derived model', ->
 
 
 
+# ----------------------------------------------------------------------
+
+
 describe 'Write filters - via function attached to the field', ->
   it 'calls the [beforeWrite] filter', ->
     stub = new Stub()
@@ -528,6 +538,10 @@ describe 'Write filters - via function attached to the field', ->
     stub.foo.beforeWrite = (value) -> 'ignore'
     stub.foo 'hello', ignoreBeforeWrite:true
     expect(stub.foo()).to.equal 'hello'
+
+
+# ----------------------------------------------------------------------
+
 
 
 describe 'Write filters - via function on derived model', ->
