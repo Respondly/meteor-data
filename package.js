@@ -1,12 +1,15 @@
 Package.describe({
-  summary: 'Schema/model system for wrapping logic around documents.'
+  name: 'respondly:data',
+  summary: 'Schema/model system for wrapping logic around documents.',
+  version: '0.0.1',
+  git: 'https://github.com/Respondly/meteor-data.git'
 });
 
 
 
 Package.on_use(function (api) {
   api.use(['coffeescript', 'check']);
-  api.use(['css-stylus', 'ctrl', 'util']);
+  api.use('respondly:util');
   api.export('Data');
 
   // Generated with: github.com/philcockfield/meteor-package-paths
@@ -26,8 +29,9 @@ Package.on_use(function (api) {
 
 
 Package.on_test(function (api) {
-  api.use(['munit', 'coffeescript', 'chai', 'insecure']);
-  api.use(['data', 'util']);
+  api.use(['mike:mocha-package@0.4.7', 'coffeescript']);
+  api.use("insecure");
+  api.use(['respondly:data', 'respondly:util']);
 
   // Generated with: github.com/philcockfield/meteor-package-paths
   api.add_files('tests/shared/_init.coffee', ['client', 'server']);

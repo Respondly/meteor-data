@@ -2,16 +2,10 @@
 Schema/model system for wrapping logic around documents.
 
 
-## Installation
-When running for the first time:
-
-    mrt update
-    package update
-
 
 ## Run Tests
 
-    mrt test-packages data -p 1234
+    meteor test-packages --driver-package mike:pkgtest respondly:data
 
 
 
