@@ -134,7 +134,8 @@ describe 'Model [changes] - reactivity', ->
     Deps.autorun -> changes = stub.changes()
     stub.foo('new-foo')
     Util.delay =>
-      expect(changes.foo.to).to.equal 'new-foo'
+      @try =>
+        expect(changes.foo.to).to.equal 'new-foo'
       done()
 
   it 'has reactive changes on Model (default of string)', (done) ->
@@ -142,7 +143,8 @@ describe 'Model [changes] - reactivity', ->
     Deps.autorun -> changes = stub.changes()
     stub.myUndefined('yo')
     Util.delay =>
-      expect(changes.myUndefined.to).to.equal 'yo'
+      @try =>
+        expect(changes.myUndefined.to).to.equal 'yo'
       done()
 
 
@@ -155,7 +157,8 @@ describe 'Model [changes] - reactivity', ->
       expect(changes.myUndefined.to).to.equal 'foo'
       stub.myUndefined.delete()
       Util.delay =>
-        expect(changes).to.equal null
+        @try =>
+          expect(changes).to.equal null
         done()
 
 

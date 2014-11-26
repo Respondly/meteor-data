@@ -87,8 +87,9 @@ describe 'SubModel: Changes (Reactive)', ->
     Deps.autorun -> changes = subModel.changes()
     subModel.name('Phil')
     Util.delay =>
-      expect(changes.name.from).to.equal 'My Name'
-      expect(changes.name.to).to.equal 'Phil'
+      @try =>
+        expect(changes.name.from).to.equal 'My Name'
+        expect(changes.name.to).to.equal 'Phil'
       done()
 
   it 'reactively reverts changes sub-model', (done) ->
@@ -100,7 +101,8 @@ describe 'SubModel: Changes (Reactive)', ->
         expect(changes.name.to).to.equal 'Phil'
         subModel.revertChanges()
         Util.delay =>
-          expect(changes).to.equal null
+          @try =>
+            expect(changes).to.equal null
           done()
 
 
@@ -115,8 +117,9 @@ describe 'SubModel: Parent Model Changes (Reactive)', ->
     Deps.autorun -> changes = model.changes()
     subModel.name('Phil')
     Util.delay =>
-      expect(changes.subModel.name.from).to.equal 'My Name'
-      expect(changes.subModel.name.to).to.equal 'Phil'
+      @try =>
+        expect(changes.subModel.name.from).to.equal 'My Name'
+        expect(changes.subModel.name.to).to.equal 'Phil'
       done()
 
 
@@ -128,7 +131,8 @@ describe 'SubModel: Parent Model Changes (Reactive)', ->
       Util.delay =>
         subModel.revertChanges()
         Util.delay =>
-          expect(changes).to.equal null
+          @try =>
+            expect(changes).to.equal null
           done()
 
 
