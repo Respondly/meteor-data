@@ -8,7 +8,9 @@ Package.describe({
 
 
 Package.onUse(function (api) {
-  api.use(['coffeescript', 'check']);
+  api.versionsFrom('1.0');
+  api.use('coffeescript');
+  api.use('check');
   api.use('respondly:util');
   api.export('Data');
 
