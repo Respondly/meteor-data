@@ -1,7 +1,7 @@
 Package.describe({
   name: 'respondly:data',
   summary: 'Schema/model system for wrapping logic around documents.',
-  version: '1.0.0',
+  version: '1.0.1',
   git: 'https://github.com/Respondly/meteor-data.git'
 });
 
@@ -11,7 +11,7 @@ Package.onUse(function (api) {
   api.versionsFrom('1.0');
   api.use('coffeescript');
   api.use('check');
-  api.use('respondly:util@1.0.0');
+  api.use('respondly:util@1.0.1');
   api.export('Data');
 
   // Generated with: github.com/philcockfield/meteor-package-paths
