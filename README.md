@@ -1,17 +1,10 @@
 # Data
 Schema/model system for wrapping logic around documents.
 
-
-## Installation
-When running for the first time:
-
-    mrt update
-    package update
+See: https://github.com/Respondly/meteor-data/blob/master/docs/models.md
 
 
-## Run Tests
 
-    mrt test-packages data -p 1234
 
 
 
