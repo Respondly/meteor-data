@@ -35,8 +35,10 @@ initStubs = ->
 
 
 
-# Tests --------------------------------------------------------
 
+
+
+# ----------------------------------------------------------------------
 
 
 describe 'Model.isModelType (class property)', ->
@@ -60,6 +62,8 @@ describe 'Model.isModelType (class property)', ->
 # ----------------------------------------------------------------------
 
 
+
+
 describe 'construction and disposal', ->
   beforeEach -> initStubs()
 
@@ -78,6 +82,57 @@ describe 'construction and disposal', ->
     expect(stub.isDisposed).to.equal undefined
     stub.dispose()
     expect(stub.isDisposed).to.equal true
+
+
+
+# ----------------------------------------------------------------------
+
+
+describe 'Model.toValues', ->
+  beforeEach -> initStubs()
+
+  it 'stores property-function values', ->
+    stub = new Stub()
+    stub.foo('My Value')
+    values = stub.toValues()
+    expect(values.foo).to.equal 'My Value'
+    expect(values.parent).to.equal 123
+    expect(values.nullDefault).to.equal null
+    expect(values.child).to.equal 'abc'
+    expect(values.base).to.equal 'overridden'
+
+  it 'stores simple values', ->
+    now = new Date()
+    stub = new Stub()
+    stub.text = 'my text'
+    stub.number = 123
+    stub.date = now
+    stub.bool = true
+
+    values = stub.toValues()
+    expect(values.text).to.equal 'my text'
+    expect(values.number).to.equal 123
+    expect(values.date).to.equal now
+    expect(values.bool).to.equal true
+
+
+  it 'does not store fields starting with "_"', ->
+    stub = new Stub()
+    stub.__foo = 'My Foo'
+
+    values = stub.toValues()
+    expect(values._instance).to.equal undefined
+    expect(values.__foo).to.equal undefined
+
+
+
+  it 'does not fail when null/undefined field exists', ->
+    stub = new Stub()
+    stub.foo('My Value')
+    stub.yo = null
+    stub.toValues()
+
+
 
 
 # ----------------------------------------------------------------------

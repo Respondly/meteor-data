@@ -220,6 +220,38 @@ Data.Model = class Model extends AutoRun
 
 
 
+  ###
+  Reads all current values onto a new object.
+  Useful for capturing a snapshot of the current model.
+  ###
+  toValues: ->
+    result = {}
+
+    isSimpleValue = (value) ->
+            return true if Object.isString(value)
+            return true if Object.isNumber(value)
+            return true if Object.isBoolean(value)
+            return true if Object.isDate(value)
+            false
+
+    for own key, value of @
+      continue unless value?
+      continue if key.startsWith('_')
+
+      if (value.def instanceof Data.FieldDefinition)
+        result[key] = @[key]()
+
+      else if isSimpleValue(value)
+        result[key] = value
+
+      else if value.isSubModel and key isnt 'parentModel'
+        result[key] = value.toValues()
+
+    result
+
+
+
+
 
 # CLASS METHODS -----------------------------------------------------------------
 

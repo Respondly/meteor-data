@@ -56,7 +56,21 @@ describe 'SubModel', ->
     expect(subModel.parentField.key).to.equal 'subModel'
 
 
+# ----------------------------------------------------------------------
 
+
+describe 'SubModel.toValues', ->
+  beforeEach -> initModels()
+
+  it 'reports sub-model on [toValues] output', ->
+    model.text('Hello')
+    model.subModel.name('I am sub-model')
+    values = model.toValues()
+    expect(values.text).to.equal 'Hello'
+    expect(values.subModel.name).to.equal 'I am sub-model'
+
+
+# ----------------------------------------------------------------------
 
 
 describe 'SubModel: Changes', ->

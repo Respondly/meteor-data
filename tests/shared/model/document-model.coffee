@@ -47,6 +47,23 @@ describe 'DocumentModel constructor', ->
     expect(stub.defaultSelector()).to.equal 123
 
 
+# ----------------------------------------------------------------------
+
+
+describe 'DocumentModel.toValues', ->
+  beforeEach -> TestModel.deleteAll()
+
+  it 'includes the ID', ->
+    stub = new Stub().insertNew()
+    values = stub.toValues()
+    expect(stub.id).not.to.equal undefined
+    expect(values.id).to.equal stub.id
+
+
+
+# ----------------------------------------------------------------------
+
+
 describe 'DocumentModel.isModelType (class property)', ->
   ParentDoc = null
   ChildDoc  = null
