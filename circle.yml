@@ -1,0 +1,23 @@
+dependencies:
+  cache_directories:
+    - "~/.meteor"
+    - "/usr/local/bin"
+
+  override:
+    # download if meteor isn't already installed in the cache
+    - meteor || curl https://install.meteor.com | /bin/sh
+    - meteor --release mike:METEOR@1.0.2 --version
+    # install reporter package and dependencies
+    # might make more sense to use the one checked into atmosphere
+    # ideally this would be verison locked too, so builds were more reproducable
+    - git clone https://github.com/respondly/meteor-test-reporter $HOME/respondly:test-reporter
+    - git clone https://github.com/respondly/meteor-css-stylus $HOME/respondly:css-stylus
+    - git clone https://github.com/respondly/meteor-css-common $HOME/respondly:css-common
+    - git clone https://github.com/respondly/meteor-ctrl $HOME/respondly:ctrl
+    - git clone https://github.com/respondly/meteor-util $HOME/respondly:util
+    # might also be wise to include reporter as a dependency here
+
+test:
+  override:
+    - PACKAGE_DIRS="..:$HOME" meteor --release mike:METEOR@1.0.2 test-packages --velocity --driver-package respondly:test-reporter respondly:data 2>&1
+
