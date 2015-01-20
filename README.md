@@ -1,6 +1,8 @@
 # Data
 Schema/model system for wrapping logic around documents.
 
+[![Circle CI](https://circleci.com/gh/Respondly/meteor-data.svg?style=svg)](https://circleci.com/gh/Respondly/meteor-data)
+
 See: https://github.com/Respondly/meteor-data/blob/master/docs/models.md
 
 
