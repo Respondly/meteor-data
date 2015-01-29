@@ -223,8 +223,11 @@ Data.Model = class Model extends AutoRun
   ###
   Reads all current values onto a new object.
   Useful for capturing a snapshot of the current model.
+  @param methodNames:   Optional.
+                        The name of non-schema method names to
+                        include in the output.
   ###
-  toValues: ->
+  toValues: (methodNames...) ->
     result = {}
 
     isSimpleValue = (value) ->
@@ -234,7 +237,7 @@ Data.Model = class Model extends AutoRun
             return true if Object.isDate(value)
             false
 
-    for own key, value of @
+    for key, value of @
       continue unless value?
       continue if key.startsWith('_')
 
@@ -243,6 +246,9 @@ Data.Model = class Model extends AutoRun
 
       else if isSimpleValue(value)
         result[key] = value
+
+      else if Object.isFunction(value) and (methodNames.any (name) -> name is key)
+        result[key] = @[key]()
 
       else if value.isSubModel and key isnt 'parentModel'
         result[key] = value.toValues()
