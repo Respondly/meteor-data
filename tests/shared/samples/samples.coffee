@@ -1,3 +1,17 @@
+MyCollection = new Meteor.Collection('test-my-collection')
+
+
+class MySchema extends Data.Schema
+  constructor: -> super
+    text: 'My Default'
+
+
+class MyModel extends Data.DocumentModel
+  constructor: (doc) ->
+    super doc, MySchema, MyCollection
+
+
+
 # MyCollection = new Meteor.Collection('my-collection')
 
 # # describe 'My Suite', ->
