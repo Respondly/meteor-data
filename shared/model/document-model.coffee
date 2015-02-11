@@ -18,8 +18,8 @@ Data.DocumentModel = class DocumentModel extends Model
   @param collection:    The Mongo collection the document resides within.
   ###
   constructor: (doc, schema, collection) ->
-    @_collection = collection
     super doc, schema
+    @__internal__.collection = collection
     @id = @_doc._id
 
 
@@ -69,7 +69,7 @@ Data.DocumentModel = class DocumentModel extends Model
       doc._id = id
 
     # Insert into collection.
-    newId   = @_collection.insert(doc)
+    newId   = @__internal__.collection.insert(doc)
     doc._id = newId
     @id     = newId
 
@@ -114,7 +114,7 @@ Data.DocumentModel = class DocumentModel extends Model
   @param options:   Optional Mongo update options.
   ###
   update: (updates, options) ->
-    @_collection.update( @defaultSelector(), updates, options )
+    @__internal__.collection.update( @defaultSelector(), updates, options )
 
 
   ###
@@ -169,7 +169,7 @@ Data.DocumentModel = class DocumentModel extends Model
   Deletes and disposes of the model.
   ###
   delete: ->
-    @_collection.remove( @defaultSelector() )
+    @__internal__.collection.remove( @defaultSelector() )
     @dispose()
 
 
@@ -177,8 +177,9 @@ Data.DocumentModel = class DocumentModel extends Model
   Re-queries the document from the collection.
   ###
   refresh: ->
-    return unless @_collection? and @_schema?
-    doc = @_collection.findOne( @id )
+    collection = @__internal__.collection
+    return unless collection? and @_schema?
+    doc = collection.findOne( @id )
     @_init( doc ) if doc?
     @
 

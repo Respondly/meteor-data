@@ -19,8 +19,8 @@ Data.Model = class Model extends AutoRun
   constructor: (doc, schema) ->
     super
     instanceCount += 1
-    @_instance     = instanceCount
-    @_schema       = schema
+    @__internal__.instance = instanceCount
+    @_schema = schema
     @_init(doc)
 
 

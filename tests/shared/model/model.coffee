@@ -121,7 +121,7 @@ describe 'Model.toValues', ->
     stub.__foo = 'My Foo'
 
     values = stub.toValues()
-    expect(values._instance).to.equal undefined
+    expect(values._doc).to.equal undefined
     expect(values.__foo).to.equal undefined
 
 
