@@ -137,7 +137,7 @@ describe 'Model [changes] - reactivity', ->
       expect(changes.foo.to).to.equal 'new-foo'
       done()
 
-  it 'has reactive changes on Model (default of string)', (done) ->
+  it 'has reactive changes on Model (default of string, undefined)', (done) ->
     changes = undefined
     Deps.autorun -> changes = stub.changes()
     stub.myUndefined('yo')

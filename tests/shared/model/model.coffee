@@ -264,13 +264,13 @@ describe 'fields', ->
     stub = new Foo()
     expect(stub.child.default).to.equal 'abc'
 
-  it 'overwrites properties', ->
+  it 'overwrites properties (child)', ->
     class Child extends Data.Model
       constructor: () -> super null, ChildSchema
     stub = new Child()
     expect(stub.base.default).to.equal 'overridden'
 
-  it 'overwrites properties', ->
+  it 'overwrites properties (parent)', ->
     class Parent extends Data.Model
       constructor: () -> super null, ParentSchema
     stub = new Parent()
@@ -661,4 +661,3 @@ describe 'Write filters - via function on derived model', ->
     expect(field.key).to.equal 'foo'
     expect(value).to.equal 'hello'
     expect(options).to.eql { hasChanged:true }
-
