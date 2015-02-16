@@ -477,9 +477,15 @@ fnField = (field, model) ->
           doc = model._doc
           parentModel = model.parentModel
           parentField = model.parentField
+          isReactive = options.isReactive ? true
+
+          # Dependency tracking.
+          if isReactive
+            fn.dependency ?= new Tracker.Dependency()
 
           # Write value.
-          if value isnt undefined
+          isWrite = value isnt undefined
+          if isWrite
             # Pre-write filter.
             #   - Example:
             #         model.foo.beforeWrite = (value, options) -> return value
@@ -509,6 +515,10 @@ fnField = (field, model) ->
             # Perform the write.
             field.write(doc, value)
 
+            # Alert auto-runs that the value changed.
+            if hasChanged
+              fn.dependency?.changed()
+
             # Post-write filter.
             #   - Example:
             #         model.foo.afterWrite = (value, options) ->
@@ -529,6 +539,12 @@ fnField = (field, model) ->
           #         model.foo.beforeRead = (value) ->
           value = field.read(doc, options)
           value = readFilter(@, field, value)
+
+          # Setup dependency if this is a READ operation.
+          if not isWrite and isReactive
+            fn.dependency?.depend()
+
+          # Finish up.
           value
 
   # Finish up.

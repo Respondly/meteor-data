@@ -42,6 +42,7 @@ Package.onTest(function (api) {
   api.addFiles('tests/shared/model/document-model.coffee', ['client', 'server']);
   api.addFiles('tests/shared/model/model-changes.coffee', ['client', 'server']);
   api.addFiles('tests/shared/model/model-factory.coffee', ['client', 'server']);
+  api.addFiles('tests/shared/model/model-reactive-props.coffee', ['client', 'server']);
   api.addFiles('tests/shared/model/model-ref.coffee', ['client', 'server']);
   api.addFiles('tests/shared/model/model-refs-collection.coffee', ['client', 'server']);
   api.addFiles('tests/shared/model/model-revert.coffee', ['client', 'server']);

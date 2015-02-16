@@ -61,28 +61,17 @@ class Data.FieldDefinition
 
 
   ###
-  Stops the field being reactive.
-  ###
-  stopReactive: -> delete @_deps
-
-
-  ###
   Reads the value of the field from the given document.
   @param doc:   The document object to read from.
   @param options:
             - useDefault: Flag indicating if the deafult value should be
                           returned if no value exists .
                           (Default:true)
-
-            - reactive:   Flag indicating if a reactive dependency should
-                          be setup for this field.
-                          (Default:false)
   ###
   read: (doc, options = {}) ->
     # Setup initial conditions.
     mapTo      = @field
     useDefault = (options.useDefault ? true) is true
-    reactive   = (options.reactive ? false) is true
 
     unless mapTo.indexOf('.') > -1
       # Shallow read.
@@ -103,11 +92,6 @@ class Data.FieldDefinition
     # Process default values (if required).
     if value is undefined and useDefault is true
       value = @createDefault()
-
-    # Setup reactive dependency (if required).
-    if reactive
-      @_deps ?= new Deps.Dependency()
-      @_deps.depend()
 
     # Finish up.
     value
@@ -133,7 +117,6 @@ class Data.FieldDefinition
 
     # Update the value.
     target.obj[ target.key ] = value
-    @_deps?.changed()
 
 
 
