@@ -50,6 +50,31 @@ describe 'DocumentModel constructor', ->
 # ----------------------------------------------------------------------
 
 
+describe 'Storing reference to model on `Data.models`', ->
+  it 'does not store at construction when no ID', ->
+    stub = new Stub()
+    for key, value of Data.models
+      expect(value).not.to.equal stub
+
+  it 'stores a reference when constructed with an ID', ->
+    stub = new Stub({ _id:'abc' })
+    expect(Data.models.abc).to.equal stub
+
+  it 'stores a reference when the model is inserted into DB', ->
+    stub = new Stub().insertNew()
+    expect(stub.id).not.to.equal undefined
+    expect(Data.models[stub.id]).to.equal stub
+
+  it 'removes reference when model is disposed', ->
+    stub = new Stub().insertNew()
+    expect(Data.models[stub.id]).to.equal stub
+    stub.dispose()
+    expect(Data.models[stub.id]).to.equal undefined
+
+
+# ----------------------------------------------------------------------
+
+
 describe 'DocumentModel.toValues', ->
   beforeEach -> TestModel.deleteAll()
 

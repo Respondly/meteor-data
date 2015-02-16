@@ -22,6 +22,11 @@ Data.DocumentModel = class DocumentModel extends Model
     @__internal__.collection = collection
     @id = @_doc._id
 
+    # Store a reference to the model.
+    if @id
+      Data.models[@id] = @
+
+
 
   ###
   Disposes of the object.
@@ -30,6 +35,7 @@ Data.DocumentModel = class DocumentModel extends Model
     super
     @_session?.dispose()
     delete @_session
+    delete Data.models[@id]
 
 
   ###
@@ -69,9 +75,10 @@ Data.DocumentModel = class DocumentModel extends Model
       doc._id = id
 
     # Insert into collection.
-    newId   = @__internal__.collection.insert(doc)
+    newId = @__internal__.collection.insert(doc)
     doc._id = newId
-    @id     = newId
+    @id = newId
+    Data.models[@id] = @
 
     # Finish up.
     @__internal__.changeStore?.clear?()
