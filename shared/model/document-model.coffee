@@ -5,6 +5,19 @@ singletonManagers = {}
 
 
 ###
+TODO
+- Method: toConversation
+- remove other _fields
+- reactive updates with DB
+- make `session` available only on client.
+
+
+
+###
+
+
+
+###
 Base class for models that represent Mongo documents.
 
 This provides a way of wrapping model logic around
@@ -13,9 +26,9 @@ a document instance.
 Data.DocumentModel = class DocumentModel extends Model
   ###
   Constructor.
-  @param doc:           The document instance being wrapped.
-  @param schema:        The schema Type (or an instance) that defines the model's properties.
-  @param collection:    The Mongo collection the document resides within.
+  @param doc:        The document instance being wrapped.
+  @param schema:     The schema Type (or an instance) that defines the model's properties.
+  @param collection: The Mongo collection the document resides within.
   ###
   constructor: (doc, schema, collection) ->
     super doc, schema
