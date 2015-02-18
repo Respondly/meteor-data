@@ -230,9 +230,9 @@ Data.DocumentModel = class DocumentModel extends Model
   ###
   refresh: ->
     collection = @db.collection
-    return unless collection? and @_schema?
-    doc = collection.findOne( @id )
-    @_init( doc ) if doc?
+    return unless collection? and @__internal__.schema?
+    doc = collection.findOne(@id)
+    @_init(doc) if doc?
     @
 
 

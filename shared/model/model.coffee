@@ -20,16 +20,17 @@ Data.Model = class Model extends AutoRun
     super
     instanceCount += 1
     @__internal__.instance = instanceCount
-    @_schema = schema
+    @__internal__.schema = schema
     @_init(doc)
 
 
   _init: (doc) ->
     @_doc = doc ? {}
+    schema = @__internal__.schema
     unless @fields
       # First time initialization.
-      if @_schema?
-        applySchema(@) if @_schema?
+      if schema?
+        applySchema(@) if schema?
         applyModelRefs(@, overwrite:false)
     else
       # This is a refresh of the document.
@@ -42,17 +43,18 @@ Data.Model = class Model extends AutoRun
   ###
   schema: ->
     # Setup initial conditions.
-    return unless @_schema
+    schema = @__internal__.schema
+    return unless schema
 
     # Ensure the value is a Schema instance.
-    if Object.isFunction( @_schema )
-      throw new Error('Not a schema Type.') unless @_schema.isSchema is yes
-      @_schema = @_schema.singleton()
+    if Object.isFunction(schema)
+      throw new Error('Not a schema Type.') unless schema.isSchema is yes
+      schema = schema.singleton()
     else
-      throw new Error('Not a schema instance.') unless (@_schema instanceof Data.Schema)
+      throw new Error('Not a schema instance.') unless (schema instanceof Data.Schema)
 
     # Finish up.
-    @_schema
+    schema
 
 
   ###
