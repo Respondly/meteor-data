@@ -7,10 +7,14 @@ singletonManagers = {}
 ###
 TODO
 - Method: toConversation
+
+  db
+    collection
+
 - remove other _fields
 - reactive updates with DB
 - make `session` available only on client.
-
+- singleton not caching it's own models
 
 
 ###
@@ -134,7 +138,7 @@ Data.DocumentModel = class DocumentModel extends Model
   @param options:   Optional Mongo update options.
   ###
   update: (updates, options) ->
-    @__internal__.collection.update( @defaultSelector(), updates, options )
+    @__internal__.collection.update(@defaultSelector(), updates, options)
 
 
   ###

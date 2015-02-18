@@ -477,40 +477,50 @@ fnField = (field, model) ->
           doc = model._doc
           parentModel = model.parentModel
           parentField = model.parentField
-          isReactive = options.isReactive ? true
+          isWrite     = value isnt undefined
+          isReactive  = options.isReactive ? true
+          isReactive  = false if isWrite
+
+          # isReactive = false
 
           # Dependency tracking.
           if isReactive
             fn.dependency ?= new Tracker.Dependency()
 
           # Write value.
-          isWrite = value isnt undefined
           if isWrite
             # Pre-write filter.
             #   - Example:
             #         model.foo.beforeWrite = (value, options) -> return value
-            value = beforeWriteFilter(@, field, value, options)
-            hasChanged = value isnt field.read(doc, options)
+            value = Tracker.nonreactive =>
+                beforeWriteFilter(@, field, value, options)
 
-            # If a change is not detected on the underlying document,
-            # do a comparison with the change-set.
-            if not hasChanged
-              if @isSubModel()
-                changeSetField = parentModel.changes()?[parentField.key]?[field.key]
-              else
-                changeSetField = @changes()?[field.key]
+            # Handle change tracking.
+            hasChanged = Tracker.nonreactive =>
+                  hasChanged = value isnt field.read(doc, options)
 
-              if changeSetField
-                hasChanged = true if not Object.equal(value, changeSetField.to)
+                  # If a change is not detected on the underlying document,
+                  # do a comparison with the change-set.
+                  if not hasChanged
+                    if @isSubModel()
+                      changeSetField = parentModel.changes()?[parentField.key]?[field.key]
+                    else
+                      changeSetField = @changes()?[field.key]
 
-            options.hasChanged = hasChanged
+                    if changeSetField
+                      hasChanged = true if not Object.equal(value, changeSetField.to)
 
-            # Store a reference to the change ("is dirty").
-            if hasChanged
-              changes = model.changes(key:field.key, value:value)
-              if model.isSubModel()
-                # This is a sub-model, register changes on the parent.
-                parentModel.changes(key:parentField.key, value:changes)
+                  options.hasChanged = hasChanged
+
+                  # Store a reference to the change ("is dirty").
+                  if hasChanged
+                    changes = model.changes(key:field.key, value:value)
+                    if model.isSubModel()
+                      # This is a sub-model, register changes on the parent.
+                      parentModel.changes(key:parentField.key, value:changes)
+
+                  # Change updates finished.
+                  hasChanged
 
             # Perform the write.
             field.write(doc, value)

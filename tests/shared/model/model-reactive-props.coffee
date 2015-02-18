@@ -57,7 +57,7 @@ describe 'Reactivity', ->
 
 
 
-    it.skip 'is not reactive for write operations', (done) ->
+    it 'is not reactive for write operations', (done) ->
       stub = new MyModel()
       count = 0
       Deps.autorun ->
