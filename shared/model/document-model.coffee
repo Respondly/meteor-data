@@ -37,6 +37,10 @@ PKG.observeCollection = (collection) ->
     removed: (id) -> Data.models[id]?.dispose()
 
 
+storeReference = (model) ->
+  if id = model.id
+    Data.models[id] ?= {}
+    Data.models[id][model.__internal__.instance] = model
 
 
 
@@ -57,14 +61,12 @@ Data.DocumentModel = class DocumentModel extends Model
     super doc, schema
     @__internal__.collection = collection
     @id = @_doc._id
+    storeReference(@)
 
-    PKG.observeCollection(collection)
+    # PKG.observeCollection(collection)
     # console.log 'TODO: Store instance on object using ID'
 
 
-    # Store a reference to the model.
-    if @id
-      Data.models[@id] = @
 
 
 
@@ -75,7 +77,8 @@ Data.DocumentModel = class DocumentModel extends Model
     super
     @_session?.dispose()
     delete @_session
-    delete Data.models[@id]
+    delete Data.models[@id][@__internal__.instance]
+    delete Data.models[@id] if Object.isEmpty(Data.models[@id])
 
 
   ###
@@ -118,7 +121,7 @@ Data.DocumentModel = class DocumentModel extends Model
     newId = @__internal__.collection.insert(doc)
     doc._id = newId
     @id = newId
-    Data.models[@id] = @
+    storeReference(@)
 
     # Finish up.
     @__internal__.changeStore?.clear?()
