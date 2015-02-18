@@ -14,7 +14,7 @@ MyModel.find = (selector = {}, options = {}) -> TestModels.find(selector, option
 
 # ----------------------------------------------------------------------
 
-describe 'Reactivity', ->
+describe.skip 'Reactivity', ->
   describe 'Reactive property-functions', ->
     beforeEach -> TestModel.deleteAll()
 

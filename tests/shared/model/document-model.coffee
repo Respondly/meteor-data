@@ -36,7 +36,7 @@ describe 'DocumentModel constructor', ->
 
   it 'stores the collection', ->
     stub = new Stub()
-    expect(stub.__internal__.collection).to.equal TestModels
+    expect(stub.db.collection).to.equal TestModels
 
   it 'stores the id', ->
     stub = new Stub({ _id:123 })

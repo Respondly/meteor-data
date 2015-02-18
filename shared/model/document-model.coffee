@@ -6,15 +6,16 @@ singletonManagers = {}
 
 ###
 TODO
-- Method: toConversation
 
   db
     collection
 
 - remove other _fields
 - reactive updates with DB
-- make `session` available only on client.
 - singleton not caching it's own models
+
+- make `session` available only on client.
+- remove _sessions
 
 ###
 
@@ -63,10 +64,13 @@ Data.DocumentModel = class DocumentModel extends Model
   ###
   constructor: (doc, schema, collection) ->
     super doc, schema
-    @__internal__.collection = collection
     @id = @_doc._id
     storeReference(@)
-    observeCollection(collection)
+    @db =
+      collection: collection
+
+    # observeCollection(collection)
+
 
 
 
@@ -118,7 +122,7 @@ Data.DocumentModel = class DocumentModel extends Model
       doc._id = id
 
     # Insert into collection.
-    newId = @__internal__.collection.insert(doc)
+    newId = @db.collection.insert(doc)
     doc._id = newId
     @id = newId
     storeReference(@)
@@ -164,7 +168,7 @@ Data.DocumentModel = class DocumentModel extends Model
   @param options:   Optional Mongo update options.
   ###
   update: (updates, options) ->
-    @__internal__.collection.update(@defaultSelector(), updates, options)
+    @db.collection.update(@defaultSelector(), updates, options)
 
 
   ###
@@ -219,7 +223,7 @@ Data.DocumentModel = class DocumentModel extends Model
   Deletes and disposes of the model.
   ###
   delete: ->
-    @__internal__.collection.remove( @defaultSelector() )
+    @db.collection.remove( @defaultSelector() )
     @dispose()
 
 
@@ -227,7 +231,7 @@ Data.DocumentModel = class DocumentModel extends Model
   Re-queries the document from the collection.
   ###
   refresh: ->
-    collection = @__internal__.collection
+    collection = @db.collection
     return unless collection? and @_schema?
     doc = collection.findOne( @id )
     @_init( doc ) if doc?
