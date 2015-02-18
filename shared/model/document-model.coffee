@@ -12,7 +12,6 @@ TODO
 - TEST: db updates for sub-models.
 
 - remove other _fields
-- singleton not caching it's own models
 
 ###
 
@@ -25,7 +24,7 @@ observeCollection = (collection) ->
   cursor = collection.find({})
   cursor.observeChanges
     changed: (id, fields) ->
-        if instances = Data.DocumentModel.models[id]
+        if instances = Data.DocumentModel.instances[id]
           for fieldName, value of fields
             for instanceId, model of instances
               # Only update the model if it has been set as reactive.
@@ -33,7 +32,7 @@ observeCollection = (collection) ->
                 model[fieldName]?(value)
 
     removed: (id) ->
-        if instances = Data.DocumentModel.models[id]
+        if instances = Data.DocumentModel.instances[id]
             for instanceId, model of instances
               model.dispose()
 
@@ -41,9 +40,8 @@ observeCollection = (collection) ->
 
 storeReference = (model) ->
   if id = model.id
-    Data.DocumentModel.models ?= {}
-    Data.DocumentModel.models[id] ?= {}
-    Data.DocumentModel.models[id][model.__internal__.instance] = model
+    Data.DocumentModel.instances[id] ?= {}
+    Data.DocumentModel.instances[id][model.__internal__.instance] = model
 
 
 # ----------------------------------------------------------------------
@@ -79,8 +77,8 @@ Data.DocumentModel = class DocumentModel extends Model
   dispose: ->
     super
     @__internal__.session?.dispose()
-    delete DocumentModel.models[@id][@__internal__.instance]
-    delete DocumentModel.models[@id] if Object.isEmpty(DocumentModel.models[@id])
+    delete DocumentModel.instances[@id][@__internal__.instance]
+    delete DocumentModel.instances[@id] if Object.isEmpty(DocumentModel.instances[@id])
 
 
 
@@ -292,41 +290,40 @@ beforeSaveFilter = (model, field, value) ->
 
 
 DocumentModel.isDocumentModelType = true # Flag used to identify the type.
+Data.DocumentModel.instances = {}
 
 
-###
-Gets the scoped-session singleton for the given model instance.
-@param instance: The [DocumentModel] instance to retrieve the session for.
-###
-DocumentModel.session = (instance) ->
-  return unless instance?.id?
-  ScopedSession.singleton( "#{ Model.typeName(instance) }:#{instance.id}" )
 
 
 ###
 Retrieves a singleton instance of a model.
-@param id:        The model/document ID.
-@param fnFactory: The factory method (or Type) to create the model with if it does not already exist.
+@param id:        The model ID or the model Type
+
+@param fnFactory: Factory for creating the model if it does not yet exist:
+                    - func(id)
+                    - ModelType(doc)
+
 ###
 DocumentModel.singleton = (id, fnFactory) ->
   # Setup initial conditions.
   return unless id?
   doc = id if id._id
   id  = doc._id if doc?
+  instances = DocumentModel.instances[id]
 
-  # Create the instance if necessary.
-  unless instances[id]?
+  # Create the model if one does not already exist.
+  if not instances? or Object.isEmpty(instances)
     if fnFactory?.isDocumentModelType and doc?
       # Create from Type.
-      instances[id] = new fnFactory(doc)
+      new fnFactory(doc)
 
     else if Object.isFunction(fnFactory)
       # Create from factory function.
-      instances[id] = fnFactory?(id)
+      fnFactory?(id)
 
-  # Retrieve the model.
-  model = instances[id]
-  model
+  # Return the first instance of the model.
+  instances = (value for key, value of DocumentModel.instances[id])
+  instances[0]
 
 
 

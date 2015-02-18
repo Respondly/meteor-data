@@ -50,32 +50,32 @@ describe 'DocumentModel constructor', ->
 # ----------------------------------------------------------------------
 
 
-describe 'Storing reference to model on `DocumentModel.models`', ->
+describe 'Storing reference to model on `DocumentModel.instances`', ->
   it 'stores a reference when constructed with an ID', ->
     stub = new Stub({ _id:'abc' })
     instanceId = stub.__internal__.instance
-    expect(Data.DocumentModel.models.abc[instanceId]).to.equal stub
+    expect(Data.DocumentModel.instances.abc[instanceId]).to.equal stub
 
   it 'stores a reference when the model is inserted into DB', ->
     stub = new Stub().insertNew()
     instanceId = stub.__internal__.instance
     expect(stub.id).not.to.equal undefined
-    expect(Data.DocumentModel.models[stub.id][instanceId]).to.equal stub
+    expect(Data.DocumentModel.instances[stub.id][instanceId]).to.equal stub
 
   it 'removes reference when model is disposed', ->
     stub1 = new Stub().insertNew()
     stub2 = new Stub(stub1._doc)
     instanceId = stub1.__internal__.instance
-    expect(Data.DocumentModel.models[stub1.id][instanceId]).to.equal stub1
+    expect(Data.DocumentModel.instances[stub1.id][instanceId]).to.equal stub1
     stub1.dispose()
-    expect(Data.DocumentModel.models[stub1.id][instanceId]).to.equal undefined
+    expect(Data.DocumentModel.instances[stub1.id][instanceId]).to.equal undefined
 
   it 'removes entire reference entry for all instances when last instance disposed', ->
     stub1 = new Stub().insertNew()
     stub2 = new Stub(stub1._doc)
     stub1.dispose()
     stub2.dispose()
-    expect(Data.DocumentModel.models[stub1.id]).to.equal undefined
+    expect(Data.DocumentModel.instances[stub1.id]).to.equal undefined
 
 
 # ----------------------------------------------------------------------
@@ -465,5 +465,59 @@ describe 'DocumentModel: [beforeSave]', ->
 
 
 describe 'DocumentModel.singleton', ->
+  beforeEach ->
+      TestModel.deleteAll()
 
+  describe 'initial model creation', ->
+    it 'creates from ID and factory function', ->
+      stub = new Stub().insertNew()
+      stub.dispose() # Ensure the factor is invoked, not just the singleton returned.
+
+      args = {}
+      fn = (id) -> args.id = id
+      Data.DocumentModel.singleton(stub.id, fn)
+      expect(args.id).not.to.equal undefined
+      expect(args.id).to.equal stub.id
+
+
+    it 'creates from doc and Type', ->
+      stub = new Stub().insertNew()
+      stub.dispose() # Ensure the factor is invoked, not just the singleton returned.
+
+      args = {}
+      fn = (doc) ->
+          args.doc = doc
+          new Stub(doc)
+      fn.isDocumentModelType = true
+      Data.DocumentModel.singleton(stub._doc, fn)
+
+      expect(args.doc).not.to.equal undefined
+      expect(args.doc).to.equal stub._doc
+
+
+  describe 'retrieving singletons', ->
+    it 'retrieves singleton from ID', ->
+      stub = new Stub().insertNew()
+      expect(Data.DocumentModel.singleton(stub.id)).to.equal stub
+      expect(Data.DocumentModel.singleton(stub.id)).to.equal stub
+      stub.dispose()
+
+    it 'retrieves singleton from doc', ->
+      stub = new Stub().insertNew()
+      expect(Data.DocumentModel.singleton(stub._doc)).to.equal stub
+      expect(Data.DocumentModel.singleton(stub._doc)).to.equal stub
+      stub.dispose()
+
+  it 'disposes of last singleton when removed from DB', ->
+    stub = new Stub().insertNew()
+    singleton1 = Data.DocumentModel.singleton(stub.id)
+    singleton2 = Data.DocumentModel.singleton(stub._doc)
+    expect(singleton1).to.equal stub
+    expect(singleton2).to.equal stub
+
+    TestModels.remove(_id:stub.id)
+    Util.delay =>
+      # NB: Delay only needed for update on server.
+      expect(Data.DocumentModel.instances[stub.id]).to.equal undefined
+      expect(Data.DocumentModel.singleton(stub.id)).to.equal undefined
 
