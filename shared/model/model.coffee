@@ -423,7 +423,7 @@ Model.log = (model, props...) ->
   writeProp(name) for name in props
 
   # Finish up.
-  console.log(model)
+  console.log(model) if Meteor.isClient
   console.groupEnd?()
   console.log ''
 

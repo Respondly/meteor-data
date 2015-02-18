@@ -19,6 +19,7 @@ Package.onUse(function (api) {
   api.addFiles('shared/ns.js', ['client', 'server']);
   api.addFiles('shared/model/model.coffee', ['client', 'server']);
   api.addFiles('shared/model/document-model.coffee', ['client', 'server']);
+  api.addFiles('shared/model/document-model.client.coffee', ['client', 'server']);
   api.addFiles('shared/model/field-definition.coffee', ['client', 'server']);
   api.addFiles('shared/model/model-factory.coffee', ['client', 'server']);
   api.addFiles('shared/model/model-refs-collection.coffee', ['client', 'server']);

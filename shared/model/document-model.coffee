@@ -7,14 +7,9 @@ singletonManagers = {}
 ###
 TODO
 
-  db
-    collection
 
 - remove other _fields
-- reactive updates with DB
 - singleton not caching it's own models
-
-- make `session` available only on client.
 
 ###
 
@@ -93,15 +88,6 @@ Data.DocumentModel = class DocumentModel extends Model
     @db.isReactive = true
     @
 
-
-  ###
-  Retrieves the scoped session for the model.
-  This can be used client-side for storing view state information.
-  ###
-  session: ->
-    return if @isDisposed
-    @__internal__.session = DocumentModel.session(@) unless @__internal__._session?
-    @__internal__.session
 
 
   ###
