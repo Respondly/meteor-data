@@ -321,37 +321,7 @@ DocumentModel.singleton = (id, fnFactory) ->
 
   # Retrieve the model.
   model = instances[id]
-  manageSingletons(model?._collection) # Ensure singletons are removed.
   model
-
-DocumentModel.instances = instances = {}
-manageSingletons = do ->
-  collections = {}
-  (col) ->
-        return unless col?
-        return if collections[col._name]?
-        collections[col._name] = col
-        col.find().observe
-          removed: (oldDoc) ->
-                      id    = oldDoc._id
-                      model = instances[id]
-                      model?.dispose()
-                      delete instances[id]
-
-
-
-
-###
-Writes a debug log of the model instances.
-###
-instances.write = ->
-  items = []
-  add = (instance) -> items.add(instance) unless Object.isFunction(value)
-  add(value) for key, value of instances
-  console.log "DocumentModel.instances (singletons): #{items.length}"
-  for instance in items
-    console.log ' > ', instance
-
 
 
 
