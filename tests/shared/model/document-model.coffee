@@ -226,7 +226,7 @@ describe 'DocumentModel: [insertNew] method', ->
     expect(Object.isDate(stub.myDate())).to.equal true
 
 
-
+# ----------------------------------------------------------------------
 
 
 describe 'DocumentModel: [changes] method', ->
@@ -311,6 +311,8 @@ describe 'DocumentModel: [changes] method', ->
     expect(stub.changes()).to.equal null
 
 
+# ----------------------------------------------------------------------
+
 
 describe 'DocumentModel: [saveChanges] method', ->
   stub = null
@@ -335,6 +337,9 @@ describe 'DocumentModel: [saveChanges] method', ->
     expect(result.length).to.equal 0
 
 
+# ----------------------------------------------------------------------
+
+
 describe 'DocumentModel: [updateFields] method', ->
   stub = null
   beforeEach ->
@@ -348,103 +353,117 @@ describe 'DocumentModel: [updateFields] method', ->
     expect(TestModels.findOne().child).to.equal 'new-value'
 
 
-
-describe 'DocumentModel: [beforeSave] filter - on [updateFields]', ->
-  stub = null
-  beforeEach ->
-    TestModel.deleteAll()
-    stub = new Stub().insertNew()
-
-  it 'invokes the before save filter', ->
-    count = 0
-    value = null
-    stub.foo.beforeSave = (v) ->
-      count += 1
-      value = v
-
-    stub.foo 'foo!'
-    stub.updateFields( stub.foo )
-    expect(count).to.equal 1
-    expect(value).to.equal 'foo!'
-
-  it 'throws an error from within the filter', ->
-    stub.foo.beforeSave = (v) -> throw new Error('My error.')
-    fn = -> stub.updateFields( stub.foo )
-    expect(fn).to.throw /My error./
+# ----------------------------------------------------------------------
 
 
-describe 'DocumentModel: [beforeSave] filter - on [updateFields] - mutating the saved value', ->
-  stub = null
-  beforeEach ->
-    TestModel.deleteAll()
-    stub = new Stub().insertNew()
-    stub.child.beforeSave = (v) -> 'mutated'
-    stub.child 'foo!'
-    stub.updateFields( stub.child )
+describe 'DocumentModel: [beforeSave]', ->
+  describe 'filter - on [updateFields]', ->
+    stub = null
+    beforeEach ->
+      TestModel.deleteAll()
+      stub = new Stub().insertNew()
 
-  it 'mutates the saved value (immediately in the doc)', ->
-    expect(stub._doc.child).to.equal 'mutated'
+    it 'invokes the before save filter', ->
+      count = 0
+      value = null
+      stub.foo.beforeSave = (v) ->
+        count += 1
+        value = v
 
-  it 'mutates the saved value (immediately on the model)', ->
-    expect(stub.child()).to.equal 'mutated'
+      stub.foo 'foo!'
+      stub.updateFields( stub.foo )
+      expect(count).to.equal 1
+      expect(value).to.equal 'foo!'
 
-  it 'mutates the saved value (in the DB)', ->
-    expect(TestModels.findOne().child).to.equal 'mutated'
-
-
-describe 'DocumentModel: [beforeSave] filter - on [insertNew]', ->
-  stub = null
-  beforeEach ->
-    TestModel.deleteAll()
-    stub = new Stub()
-
-  it 'invokes the before save filter', ->
-    stub.foo 'value-1'
-
-    callbackResult = { count:0 }
-    stub.foo.beforeSave = (value) ->
-      callbackResult.count += 1
-      callbackResult.value = value
-
-    stub.insertNew()
-    expect(callbackResult.count).to.equal 1
-    expect(callbackResult.value.to).to.equal 'value-1'
+    it 'throws an error from within the filter', ->
+      stub.foo.beforeSave = (v) -> throw new Error('My error.')
+      fn = -> stub.updateFields( stub.foo )
+      expect(fn).to.throw /My error./
 
 
-describe 'DocumentModel: [beforeSave] filter - mutating the saved value', ->
-  stub = null
-  beforeEach ->
-    TestModel.deleteAll()
-    stub = new Stub()
-    stub.child.beforeSave = (v) -> 'mutated'
-    stub.child 'foo!'
-    stub.insertNew()
-
-  it 'mutates the saved value (immediately in the doc)', ->
-    expect(stub._doc.child).to.equal 'mutated'
-
-  it 'mutates the saved value (immediately on the model)', ->
-    expect(stub.child()).to.equal 'mutated'
-
-  it 'mutates the saved value (in the DB)', ->
-    expect(TestModels.findOne().child).to.equal 'mutated'
+  # ----------------------------------------------------------------------
 
 
+  describe 'filter - on [updateFields] - mutating the saved value', ->
+    stub = null
+    beforeEach ->
+      TestModel.deleteAll()
+      stub = new Stub().insertNew()
+      stub.child.beforeSave = (v) -> 'mutated'
+      stub.child 'foo!'
+      stub.updateFields( stub.child )
 
-describe 'DocumentModel: [beforeSave] filter - on [setDefaultValues]', ->
-  stub = null
-  beforeEach ->
-    TestModel.deleteAll()
-    stub = new Stub().insertNew()
+    it 'mutates the saved value (immediately in the doc)', ->
+      expect(stub._doc.child).to.equal 'mutated'
 
-  it 'invokes the before save filter', ->
-    stub.foo 'value-1'
+    it 'mutates the saved value (immediately on the model)', ->
+      expect(stub.child()).to.equal 'mutated'
 
-    callbackResult = { count:0 }
-    stub.foo.beforeSave = (value) ->
-      callbackResult.count += 1
-      callbackResult.value = value
+    it 'mutates the saved value (in the DB)', ->
+      expect(TestModels.findOne().child).to.equal 'mutated'
 
-    stub.setDefaultValues()
-    expect(callbackResult.count).to.equal 1
-    expect(callbackResult.value.to).to.equal 'value-1'
+
+  describe 'filter - on [insertNew]', ->
+    stub = null
+    beforeEach ->
+      TestModel.deleteAll()
+      stub = new Stub()
+
+    it 'invokes the before save filter', ->
+      stub.foo 'value-1'
+
+      callbackResult = { count:0 }
+      stub.foo.beforeSave = (value) ->
+        callbackResult.count += 1
+        callbackResult.value = value
+
+      stub.insertNew()
+      expect(callbackResult.count).to.equal 1
+      expect(callbackResult.value.to).to.equal 'value-1'
+
+
+  describe 'DocumentModel: [beforeSave] filter - mutating the saved value', ->
+    stub = null
+    beforeEach ->
+      TestModel.deleteAll()
+      stub = new Stub()
+      stub.child.beforeSave = (v) -> 'mutated'
+      stub.child 'foo!'
+      stub.insertNew()
+
+    it 'mutates the saved value (immediately in the doc)', ->
+      expect(stub._doc.child).to.equal 'mutated'
+
+    it 'mutates the saved value (immediately on the model)', ->
+      expect(stub.child()).to.equal 'mutated'
+
+    it 'mutates the saved value (in the DB)', ->
+      expect(TestModels.findOne().child).to.equal 'mutated'
+
+
+
+  describe 'DocumentModel: [beforeSave] filter - on [setDefaultValues]', ->
+    stub = null
+    beforeEach ->
+      TestModel.deleteAll()
+      stub = new Stub().insertNew()
+
+    it 'invokes the before save filter', ->
+      stub.foo 'value-1'
+
+      callbackResult = { count:0 }
+      stub.foo.beforeSave = (value) ->
+        callbackResult.count += 1
+        callbackResult.value = value
+
+      stub.setDefaultValues()
+      expect(callbackResult.count).to.equal 1
+      expect(callbackResult.value.to).to.equal 'value-1'
+
+
+# ----------------------------------------------------------------------
+
+
+describe 'DocumentModel.singleton', ->
+
+
