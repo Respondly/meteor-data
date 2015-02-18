@@ -15,7 +15,6 @@ TODO
 - singleton not caching it's own models
 
 - make `session` available only on client.
-- remove _sessions
 
 ###
 
@@ -82,8 +81,7 @@ Data.DocumentModel = class DocumentModel extends Model
   ###
   dispose: ->
     super
-    @_session?.dispose()
-    delete @_session
+    @__internal__.session?.dispose()
     delete Data.models[@id][@__internal__.instance]
     delete Data.models[@id] if Object.isEmpty(Data.models[@id])
 
@@ -102,8 +100,8 @@ Data.DocumentModel = class DocumentModel extends Model
   ###
   session: ->
     return if @isDisposed
-    @_session = DocumentModel.session(@) unless @_session?
-    @_session
+    @__internal__.session = DocumentModel.session(@) unless @__internal__._session?
+    @__internal__.session
 
 
   ###
