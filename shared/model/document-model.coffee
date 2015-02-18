@@ -1,12 +1,15 @@
 #= require ./model
 Model = Data.Model
-singletonManagers = {}
 
 
 
 ###
 TODO
 
+- don't use dependency when not isReactive
+- strip out fnFunc into it's own file.
+
+- TEST: db updates for sub-models.
 
 - remove other _fields
 - singleton not caching it's own models
@@ -22,7 +25,7 @@ observeCollection = (collection) ->
   cursor = collection.find({})
   cursor.observeChanges
     changed: (id, fields) ->
-        if instances = Data.models[id]
+        if instances = Data.DocumentModel.models[id]
           for fieldName, value of fields
             for instanceId, model of instances
               # Only update the model if it has been set as reactive.
@@ -30,7 +33,7 @@ observeCollection = (collection) ->
                 model[fieldName]?(value)
 
     removed: (id) ->
-        if instances = Data.models[id]
+        if instances = Data.DocumentModel.models[id]
             for instanceId, model of instances
               model.dispose()
 
@@ -38,8 +41,9 @@ observeCollection = (collection) ->
 
 storeReference = (model) ->
   if id = model.id
-    Data.models[id] ?= {}
-    Data.models[id][model.__internal__.instance] = model
+    Data.DocumentModel.models ?= {}
+    Data.DocumentModel.models[id] ?= {}
+    Data.DocumentModel.models[id][model.__internal__.instance] = model
 
 
 # ----------------------------------------------------------------------
@@ -65,9 +69,7 @@ Data.DocumentModel = class DocumentModel extends Model
     @db =
       collection: collection
       isReactive: false
-
     observeCollection(collection)
-
 
 
 
@@ -77,12 +79,15 @@ Data.DocumentModel = class DocumentModel extends Model
   dispose: ->
     super
     @__internal__.session?.dispose()
-    delete Data.models[@id][@__internal__.instance]
-    delete Data.models[@id] if Object.isEmpty(Data.models[@id])
+    delete DocumentModel.models[@id][@__internal__.instance]
+    delete DocumentModel.models[@id] if Object.isEmpty(DocumentModel.models[@id])
+
 
 
   ###
   Makes the model reactive.
+  - properties-functions become reactive
+  - changes to within the DB are propogated to the model.
   ###
   reactive: ->
     @db.isReactive = true
@@ -133,9 +138,9 @@ Data.DocumentModel = class DocumentModel extends Model
   ###
   setDefaultValues: ->
     # Setup initial conditions.
-    result  = super
+    result = super
     changes = @changes()
-    now     = +(new Date())
+    now = +(new Date())
 
     # Set the 'createdAt' timestamp if required.
     if Object.isFunction(@createdAt)

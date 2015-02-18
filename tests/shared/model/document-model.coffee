@@ -50,32 +50,32 @@ describe 'DocumentModel constructor', ->
 # ----------------------------------------------------------------------
 
 
-describe 'Storing reference to model on `Data.models`', ->
+describe 'Storing reference to model on `DocumentModel.models`', ->
   it 'stores a reference when constructed with an ID', ->
     stub = new Stub({ _id:'abc' })
     instanceId = stub.__internal__.instance
-    expect(Data.models.abc[instanceId]).to.equal stub
+    expect(Data.DocumentModel.models.abc[instanceId]).to.equal stub
 
   it 'stores a reference when the model is inserted into DB', ->
     stub = new Stub().insertNew()
     instanceId = stub.__internal__.instance
     expect(stub.id).not.to.equal undefined
-    expect(Data.models[stub.id][instanceId]).to.equal stub
+    expect(Data.DocumentModel.models[stub.id][instanceId]).to.equal stub
 
   it 'removes reference when model is disposed', ->
     stub1 = new Stub().insertNew()
     stub2 = new Stub(stub1._doc)
     instanceId = stub1.__internal__.instance
-    expect(Data.models[stub1.id][instanceId]).to.equal stub1
+    expect(Data.DocumentModel.models[stub1.id][instanceId]).to.equal stub1
     stub1.dispose()
-    expect(Data.models[stub1.id][instanceId]).to.equal undefined
+    expect(Data.DocumentModel.models[stub1.id][instanceId]).to.equal undefined
 
   it 'removes entire reference entry for all instances when last instance disposed', ->
     stub1 = new Stub().insertNew()
     stub2 = new Stub(stub1._doc)
     stub1.dispose()
     stub2.dispose()
-    expect(Data.models[stub1.id]).to.equal undefined
+    expect(Data.DocumentModel.models[stub1.id]).to.equal undefined
 
 
 # ----------------------------------------------------------------------
