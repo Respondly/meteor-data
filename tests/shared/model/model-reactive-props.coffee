@@ -75,7 +75,7 @@ describe 'Reactivity', ->
   # ----------------------------------------------------------------------
 
 
-  describe.skip 'Reactive updates via Mongo', (done) ->
+  describe 'Reactive updates via Mongo', (done) ->
     beforeEach -> TestModel.deleteAll()
 
     it 'updates a model when the data-source changes', ->

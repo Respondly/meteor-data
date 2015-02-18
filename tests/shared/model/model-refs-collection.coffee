@@ -37,6 +37,7 @@ initStubs = ->
 
 
 
+
 describe 'RefsCollection', ->
   beforeEach -> initStubs()
 
