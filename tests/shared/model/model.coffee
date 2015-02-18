@@ -84,6 +84,14 @@ describe 'construction and disposal', ->
     expect(stub.isDisposed).to.equal true
 
 
+# ----------------------------------------------------------------------
+
+describe 'Logging', ->
+  it 'logs to the console', ->
+    stub = new Stub()
+    stub.log()
+
+
 
 # ----------------------------------------------------------------------
 

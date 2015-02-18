@@ -383,10 +383,18 @@ Model.log = (model, props...) ->
     props = props.removeAt(props.length - 1)
 
   # Write the model (with or without a title).
-  if title = options.title
-    console.log title, model
+  if console.group
+    if title = options.title
+      console.group(title)
+    else
+      console.group('Model')
+
   else
-    console.log model
+    if title = options.title
+      console.log(title)
+    else
+      console.log('Model')
+
 
   writeProp = (name, label) ->
         convertToString = false
@@ -415,6 +423,8 @@ Model.log = (model, props...) ->
   writeProp(name) for name in props
 
   # Finish up.
+  console.log(model)
+  console.groupEnd?()
   console.log ''
 
 
