@@ -6,7 +6,6 @@ Model = Data.Model
 ###
 TODO
 
-- don't use dependency when not isReactive
 - strip out fnFunc into it's own file.
 
 - TEST: db updates for sub-models.
@@ -64,9 +63,7 @@ Data.DocumentModel = class DocumentModel extends Model
     super doc, schema
     @id = @_doc._id
     storeReference(@)
-    @db =
-      collection: collection
-      isReactive: false
+    @db.collection = collection
     observeCollection(collection)
 
 
@@ -80,16 +77,6 @@ Data.DocumentModel = class DocumentModel extends Model
     delete DocumentModel.instances[@id][@__internal__.instance]
     delete DocumentModel.instances[@id] if Object.isEmpty(DocumentModel.instances[@id])
 
-
-
-  ###
-  Makes the model reactive.
-  - properties-functions become reactive
-  - changes to within the DB are propogated to the model.
-  ###
-  reactive: ->
-    @db.isReactive = true
-    @
 
 
 
@@ -221,7 +208,7 @@ Data.DocumentModel = class DocumentModel extends Model
   Deletes and disposes of the model.
   ###
   delete: ->
-    @db.collection.remove( @defaultSelector() )
+    @db.collection.remove(@defaultSelector())
     @dispose()
 
 

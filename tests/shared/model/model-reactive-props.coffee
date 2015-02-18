@@ -29,6 +29,22 @@ describe 'Reactivity', ->
       expect(stub.db.isReactive).to.equal true
 
 
+    it 'is does not cause autorun to fire when not reactive', (done) ->
+      stub = new MyModel()
+
+      count = 0
+      Deps.autorun ->
+          stub.value(undefined)
+          count += 1
+
+      count = 0
+      stub.value(1)
+
+      Util.delay ->
+        expect(count).to.equal 0
+        done()
+
+
     it 'is reactive on read operation (default)', (done) ->
       stub = new MyModel().reactive()
 
@@ -46,10 +62,16 @@ describe 'Reactivity', ->
 
 
     it 'has a `dependency` on the field when read', ->
-      stub = new MyModel()
+      stub = new MyModel().reactive()
       expect(stub.value.dependency).to.equal undefined
       stub.value()
       expect(stub.value.dependency).to.be.an.instanceOf Tracker.Dependency
+
+    it 'does not have a `dependency` on the field when read', ->
+      stub = new MyModel()
+      expect(stub.value.dependency).to.equal undefined
+      stub.value()
+      expect(stub.value.dependency).to.equal undefined
 
 
     it 'is optionally non-reactive', (done) ->

@@ -1,7 +1,7 @@
 #= require ../ns.js
 #= base
-
 instanceCount = 0
+
 
 
 ###
@@ -23,6 +23,8 @@ Data.Model = class Model extends AutoRun
     instanceCount += 1
     @__internal__.instance = instanceCount
     @__internal__.schema = schema
+    @db =
+      isReactive: false
 
     # Internal initialization method.
     @__internal__.init = (doc) =>
@@ -60,6 +62,17 @@ Data.Model = class Model extends AutoRun
 
     # Finish up.
     schema
+
+
+  ###
+  Makes the model reactive.
+  - properties-functions become reactive
+  - changes to within the DB are propogated to the model.
+  ###
+  reactive: ->
+    @db.isReactive = true
+    @
+
 
 
   ###
@@ -503,6 +516,7 @@ fnField = (field, model) ->
           isWrite     = value isnt undefined
           isReactive  = options.isReactive ? true
           isReactive  = false if isWrite
+          isReactive  = false if not model.db.isReactive
 
           # Dependency tracking.
           if isReactive
