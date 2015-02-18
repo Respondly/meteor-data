@@ -14,12 +14,23 @@ MyModel.find = (selector = {}, options = {}) -> TestModels.find(selector, option
 
 # ----------------------------------------------------------------------
 
-describe.skip 'Reactivity', ->
+describe 'Reactivity', ->
   describe 'Reactive property-functions', ->
     beforeEach -> TestModel.deleteAll()
 
-    it 'is reactive on read operation (by default)', (done) ->
+    it 'is not reactive by default', ->
       stub = new MyModel()
+      expect(stub.db.isReactive).to.equal false
+
+    it 'turns reactivity on via the `reactive` method', ->
+      stub = new MyModel()
+      expect(stub.db.isReactive).to.equal false
+      stub.reactive()
+      expect(stub.db.isReactive).to.equal true
+
+
+    it 'is reactive on read operation (default)', (done) ->
+      stub = new MyModel().reactive()
 
       count = 0
       Deps.autorun ->
@@ -75,17 +86,28 @@ describe.skip 'Reactivity', ->
   # ----------------------------------------------------------------------
 
 
-  describe 'Reactive updates via Mongo', (done) ->
+  describe 'Reactive updates via Mongo', ->
     beforeEach -> TestModel.deleteAll()
 
     it 'updates a model when the data-source changes', ->
+      model1 = new MyModel().insertNew().reactive()
+      model2 = MyModel.find({_id:model1.id})[0].reactive()
+      expect(model1.value()).to.equal model2.value()
+
+      model1.value('new value', save:true)
+      Util.delay =>
+        expect(model1.value()).to.equal model2.value()
+
+
+    it 'does not update when not set as reactive', ->
       model1 = new MyModel().insertNew()
       model2 = MyModel.find({_id:model1.id})[0]
       expect(model1.value()).to.equal model2.value()
 
       model1.value('new value', save:true)
       Util.delay =>
-        expect(model1.value()).to.equal model2.value()
+        expect(model1.value()).to.equal 'new value'
+        expect(model2.value()).to.equal 0
 
 
     it 'disposes of the model when removed from DB', ->
@@ -95,4 +117,20 @@ describe.skip 'Reactivity', ->
       Util.delay =>
         expect(model.isDisposed).to.equal true
 
+
+    describe.skip 'changes when syncing from DB', ->
+      model1 = null
+      model2 = null
+      beforeEach ->
+        TestModel.deleteAll()
+        model1 = new MyModel().insertNew().reactive()
+        model2 = MyModel.find({_id:model1.id})[0].reactive()
+
+      it 'has not changes when DB is altered and there is not dirty value', (done) ->
+        model1.value('Yo', save:true)
+        Util.delay =>
+          expect(model2.value()).to.equal 'Yo'
+          console.log 'model1.changes()', model1.changes()
+          console.log 'model2.changes()', model2.changes()
+          done()
 

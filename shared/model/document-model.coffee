@@ -31,7 +31,9 @@ observeCollection = (collection) ->
         if instances = Data.models[id]
           for fieldName, value of fields
             for instanceId, model of instances
-              model[fieldName]?(value)
+              # Only update the model if it has been set as reactive.
+              if model.db.isReactive
+                model[fieldName]?(value)
 
     removed: (id) ->
         if instances = Data.models[id]
@@ -68,8 +70,9 @@ Data.DocumentModel = class DocumentModel extends Model
     storeReference(@)
     @db =
       collection: collection
+      isReactive: false
 
-    # observeCollection(collection)
+    observeCollection(collection)
 
 
 
@@ -83,6 +86,14 @@ Data.DocumentModel = class DocumentModel extends Model
     delete @_session
     delete Data.models[@id][@__internal__.instance]
     delete Data.models[@id] if Object.isEmpty(Data.models[@id])
+
+
+  ###
+  Makes the model reactive.
+  ###
+  reactive: ->
+    @db.isReactive = true
+    @
 
 
   ###

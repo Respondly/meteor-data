@@ -482,6 +482,12 @@ applyModelRefs = (model, options = {}) ->
 
 
 fnField = (field, model) ->
+  ###
+  Reads or writes the field.
+  @param value
+  @param options:
+           - save:    Saves the model (if a DocumentModel)
+  ###
   fn = (value, options = {}) ->
           # Setup initial conditions.
           doc = model._doc
@@ -490,8 +496,6 @@ fnField = (field, model) ->
           isWrite     = value isnt undefined
           isReactive  = options.isReactive ? true
           isReactive  = false if isWrite
-
-          # isReactive = false
 
           # Dependency tracking.
           if isReactive
