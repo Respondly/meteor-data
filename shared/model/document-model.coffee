@@ -15,26 +15,28 @@ TODO
 - reactive updates with DB
 - make `session` available only on client.
 - singleton not caching it's own models
-- Store instances on Data.models.{instance} on object using instance ID
 
 ###
 
 
 observers = {}
-
-
-PKG.observeCollection = (collection) ->
+observeCollection = (collection) ->
   name = collection._name
   return if observers[name]
 
   cursor = collection.find({})
   cursor.observeChanges
     changed: (id, fields) ->
-        if model = Data.models[id]
-          for key, value of fields
-            model[key]?(value)
+        if instances = Data.models[id]
+          for fieldName, value of fields
+            for instanceId, model of instances
+              model[fieldName]?(value)
 
-    removed: (id) -> Data.models[id]?.dispose()
+    removed: (id) ->
+        if instances = Data.models[id]
+            for instanceId, model of instances
+              model.dispose()
+
 
 
 storeReference = (model) ->
@@ -42,6 +44,8 @@ storeReference = (model) ->
     Data.models[id] ?= {}
     Data.models[id][model.__internal__.instance] = model
 
+
+# ----------------------------------------------------------------------
 
 
 ###
@@ -62,11 +66,7 @@ Data.DocumentModel = class DocumentModel extends Model
     @__internal__.collection = collection
     @id = @_doc._id
     storeReference(@)
-
-    # PKG.observeCollection(collection)
-    # console.log 'TODO: Store instance on object using ID'
-
-
+    observeCollection(collection)
 
 
 
