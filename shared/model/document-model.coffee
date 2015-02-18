@@ -232,7 +232,7 @@ Data.DocumentModel = class DocumentModel extends Model
     collection = @db.collection
     return unless collection? and @__internal__.schema?
     doc = collection.findOne(@id)
-    @_init(doc) if doc?
+    @__internal__.init(doc) if doc?
     @
 
 

@@ -18,23 +18,28 @@ Data.Model = class Model extends AutoRun
   ###
   constructor: (doc, schema) ->
     super
+
+    # Store state.
     instanceCount += 1
     @__internal__.instance = instanceCount
     @__internal__.schema = schema
-    @_init(doc)
+
+    # Internal initialization method.
+    @__internal__.init = (doc) =>
+        @_doc = doc ? {}
+        unless @fields
+          # First time initialization.
+          if schema?
+            applySchema(@) if schema?
+            applyModelRefs(@, overwrite:false)
+        else
+          # This is a refresh of the document.
+          applyModelRefs(@, overwrite:true)
+
+    # Finish up.
+    @__internal__.init(doc)
 
 
-  _init: (doc) ->
-    @_doc = doc ? {}
-    schema = @__internal__.schema
-    unless @fields
-      # First time initialization.
-      if schema?
-        applySchema(@) if schema?
-        applyModelRefs(@, overwrite:false)
-    else
-      # This is a refresh of the document.
-      applyModelRefs(@, overwrite:true)
 
 
 
