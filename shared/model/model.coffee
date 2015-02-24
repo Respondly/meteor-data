@@ -19,12 +19,21 @@ Data.Model = class Model extends AutoRun
   constructor: (doc, schema) ->
     super
 
+    # Ensure the value is a Schema instance.
+    if Object.isFunction(schema)
+      throw new Error('Not a schema Type') unless schema.isSchema is true
+      schema = schema.singleton()
+    else
+      throw new Error('Not a schema instance.') unless (schema instanceof Data.Schema)
+
+
     # Store state.
     instanceCount += 1
     @__internal__.instance = instanceCount
     @__internal__.schema = schema
     @db =
       isReactive: false
+      schema: schema
 
     # Internal initialization method.
     @__internal__.init = (doc) =>
@@ -45,23 +54,23 @@ Data.Model = class Model extends AutoRun
 
 
 
-  ###
-  Retrieves the schema instance that defines the model.
-  ###
-  schema: ->
-    # Setup initial conditions.
-    schema = @__internal__.schema
-    return unless schema
+  # ###
+  # Retrieves the schema instance that defines the model.
+  # ###
+  # schema: ->
+  #   # Setup initial conditions.
+  #   schema = @__internal__.schema
+  #   return unless schema
 
-    # Ensure the value is a Schema instance.
-    if Object.isFunction(schema)
-      throw new Error('Not a schema Type.') unless schema.isSchema is yes
-      schema = schema.singleton()
-    else
-      throw new Error('Not a schema instance.') unless (schema instanceof Data.Schema)
+  #   # Ensure the value is a Schema instance.
+  #   if Object.isFunction(schema)
+  #     throw new Error('Not a schema Type.') unless schema.isSchema is yes
+  #     schema = schema.singleton()
+  #   else
+  #     throw new Error('Not a schema instance.') unless (schema instanceof Data.Schema)
 
-    # Finish up.
-    schema
+  #   # Finish up.
+  #   schema
 
 
   ###
@@ -84,7 +93,7 @@ Data.Model = class Model extends AutoRun
   ###
   setDefaultValues: ->
     # Setup initial conditions.
-    schema = @schema()
+    schema = @db.schema
     return @ unless schema
 
     # Write each field.
@@ -443,6 +452,7 @@ Model.log = (model, props...) ->
   # Write props.
   writeProp('id')
   writeProp('_doc', 'doc')
+  writeProp('db')
   writeProp(name) for name in props
 
   # Finish up.
@@ -465,7 +475,7 @@ assign = (model, key, value, options = {}) ->
 
 
 applySchema = (model) ->
-  schema = model.schema()
+  schema = model.db.schema
 
   # Store a reference to the fields.
   model.db.fields ?= schema.fields
@@ -482,7 +492,7 @@ applySchema = (model) ->
 
 
 applyModelRefs = (model, options = {}) ->
-  schema = model.schema()
+  schema = model.db.schema
   for key, value of schema.fields
     if value.modelRef?
 

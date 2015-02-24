@@ -217,7 +217,7 @@ Data.DocumentModel = class DocumentModel extends Model
   ###
   refresh: ->
     collection = @db.collection
-    return unless collection? and @__internal__.schema?
+    return unless collection? and @db.schema?
     doc = collection.findOne(@id)
     @__internal__.init(doc) if doc?
     @
