@@ -38,7 +38,7 @@ describe 'core.Schema (modelRef)', ->
 
   it 'references a model (from object)', ->
     root   = new RootModel()
-    field  = root.fields.myObjRef
+    field  = root.db.fields.myObjRef
     expect(field.modelRef).to.equal fnFactory
 
 

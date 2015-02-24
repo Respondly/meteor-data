@@ -160,8 +160,8 @@ class Data.ModelRefsCollection
 
 
   _saveParentRefs: ->
-    field = @parent.fields[@refsKey]
-    @parent.updateFields( field )
+    field = @parent.db.fields[@refsKey]
+    @parent.updateFields(field)
 
 
 

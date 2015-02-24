@@ -149,18 +149,18 @@ describe 'Model.toValues', ->
 describe 'Schema', ->
   beforeEach -> initStubs()
 
-  it 'applies schema from schema-Type singlton', ->
+  it 'applies schema from schema-Type singleton', ->
     class Foo extends Data.Model
       constructor: -> super null, ChildSchema
     foo = new Foo()
-    expect(foo.fields).to.equal ChildSchema.singleton().fields
+    expect(foo.db.fields).to.equal ChildSchema.singleton().fields
 
   it 'applies schema from instance', ->
     schemaInstance = new ChildSchema()
     class Foo extends Data.Model
       constructor: -> super null, schemaInstance
     foo = new Foo()
-    expect(foo.fields).to.equal schemaInstance.fields
+    expect(foo.db.fields).to.equal schemaInstance.fields
 
   it 'throw if schema-Type not passed', ->
     class NotSchema

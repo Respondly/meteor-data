@@ -172,7 +172,7 @@ Data.DocumentModel = class DocumentModel extends Model
 
     # Set the 'updatedAt' timestamp if required.
     do =>
-      updatedAt = @fields.updatedAt
+      updatedAt = @db.fields.updatedAt
       if updatedAt?.type?.name is 'Date'
         alreadyExists = fields.find (item) -> item.key is updatedAt.key
         unless alreadyExists

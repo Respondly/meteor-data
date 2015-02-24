@@ -86,7 +86,7 @@ describe 'Reading HasOne reference', ->
   it 'refreshes the cached model', ->
     stub = new Foo()
     bar = new Bar(doc1)
-    stub.foo bar
+    stub.foo(bar)
     stub.foo() # Model is now cached.
 
     bar.text 'new-value', save:true

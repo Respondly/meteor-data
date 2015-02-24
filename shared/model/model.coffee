@@ -29,7 +29,7 @@ Data.Model = class Model extends AutoRun
     # Internal initialization method.
     @__internal__.init = (doc) =>
         @_doc = doc ? {}
-        unless @fields
+        unless @db.fields
           # First time initialization.
           if schema?
             applySchema(@) if schema?
@@ -307,7 +307,7 @@ Model.syncChanges = (model, changes = {}) ->
 
   for key, value of changes
     member = model[key]
-    fields.push( model.fields[key] )
+    fields.push( model.db.fields[key] )
 
     if Object.isFunction(member)
       model[key](value.to) # Write to the property function.
@@ -468,16 +468,16 @@ applySchema = (model) ->
   schema = model.schema()
 
   # Store a reference to the fields.
-  model.fields ?= schema.fields
+  model.db.fields ?= schema.fields
 
   # Apply fields.
   for key, value of schema.fields
     unless value.modelRef?
       # Assign a read/write property-function.
-      assign( model, key, fnField(value, model) )
+      assign(model, key, fnField(value, model))
 
     if value.hasOne?
-      assign model, value.hasOne.key, fnHasOne(value, model)
+      assign(model, value.hasOne.key, fnHasOne(value, model))
 
 
 
