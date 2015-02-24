@@ -145,8 +145,8 @@ describe 'Model', ->
 
 
 
-
   # ----------------------------------------------------------------------
+
 
 
   describe 'Schema', ->
@@ -156,14 +156,14 @@ describe 'Model', ->
       class Foo extends Data.Model
         constructor: -> super null, ChildSchema
       foo = new Foo()
-      expect(foo.db.fields).to.equal ChildSchema.singleton().fields
+      expect(foo.db.schema.fields).to.equal ChildSchema.singleton().fields
 
     it 'applies schema from instance', ->
       schemaInstance = new ChildSchema()
       class Foo extends Data.Model
         constructor: -> super null, schemaInstance
       foo = new Foo()
-      expect(foo.db.fields).to.equal schemaInstance.fields
+      expect(foo.db.schema.fields).to.equal schemaInstance.fields
 
     it 'throw if schema-Type not passed', ->
       class NotSchema

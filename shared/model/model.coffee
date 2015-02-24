@@ -30,19 +30,17 @@ Data.Model = class Model extends AutoRun
     # Store state.
     instanceCount += 1
     @__internal__.instance = instanceCount
-    @__internal__.schema = schema
     @db =
       isReactive: false
-      schema: schema
 
     # Internal initialization method.
     @__internal__.init = (doc) =>
         @_doc = doc ? {}
-        unless @db.fields
+        unless @db.schema
           # First time initialization.
-          if schema?
-            applySchema(@) if schema?
-            applyModelRefs(@, overwrite:false)
+          @db.schema = schema
+          applySchema(@) if schema?
+          applyModelRefs(@, overwrite:false)
         else
           # This is a refresh of the document.
           applyModelRefs(@, overwrite:true)
@@ -51,26 +49,6 @@ Data.Model = class Model extends AutoRun
     @__internal__.init(doc)
 
 
-
-
-
-  # ###
-  # Retrieves the schema instance that defines the model.
-  # ###
-  # schema: ->
-  #   # Setup initial conditions.
-  #   schema = @__internal__.schema
-  #   return unless schema
-
-  #   # Ensure the value is a Schema instance.
-  #   if Object.isFunction(schema)
-  #     throw new Error('Not a schema Type.') unless schema.isSchema is yes
-  #     schema = schema.singleton()
-  #   else
-  #     throw new Error('Not a schema instance.') unless (schema instanceof Data.Schema)
-
-  #   # Finish up.
-  #   schema
 
 
   ###
@@ -316,7 +294,7 @@ Model.syncChanges = (model, changes = {}) ->
 
   for key, value of changes
     member = model[key]
-    fields.push( model.db.fields[key] )
+    fields.push(model.db.schema.fields[key])
 
     if Object.isFunction(member)
       model[key](value.to) # Write to the property function.
@@ -478,7 +456,7 @@ applySchema = (model) ->
   schema = model.db.schema
 
   # Store a reference to the fields.
-  model.db.fields ?= schema.fields
+  # model.db..fields ?= schema.fields
 
   # Apply fields.
   for key, value of schema.fields

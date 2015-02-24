@@ -160,7 +160,7 @@ class Data.ModelRefsCollection
 
 
   _saveParentRefs: ->
-    field = @parent.db.fields[@refsKey]
+    field = @parent.db.schema.fields[@refsKey]
     @parent.updateFields(field)
 
 
