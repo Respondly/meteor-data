@@ -66,11 +66,14 @@ Data.Model = class Model extends AutoRun
 
   ###
   Makes the model reactive.
-  - properties-functions become reactive
-  - changes to within the DB are propogated to the model.
+    - property-functions become reactive
+    - changes to within the DB are propogated to the model.
+
+  @param isReactive: Optional - default is true.
+  @returns the model allowing the method to be called within a chain.
   ###
-  reactive: ->
-    @db.isReactive = true
+  reactive: (isReactive = true) ->
+    @db.isReactive = isReactive
     @
 
 

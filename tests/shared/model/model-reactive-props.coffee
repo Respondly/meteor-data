@@ -28,6 +28,13 @@ describe 'Reactivity', ->
       stub.reactive()
       expect(stub.db.isReactive).to.equal true
 
+    it 'turns reactivity off via the `reactive` method', ->
+      stub = new MyModel()
+      stub.reactive(true)
+      expect(stub.db.isReactive).to.equal true
+      stub.reactive(false)
+      expect(stub.db.isReactive).to.equal false
+
 
     it 'is does not cause autorun to fire when not reactive', (done) ->
       stub = new MyModel()
