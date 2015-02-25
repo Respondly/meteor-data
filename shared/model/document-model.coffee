@@ -62,7 +62,7 @@ Data.DocumentModel = class DocumentModel extends Model
   dispose: ->
     super
     @__internal__.session?.dispose()
-    delete DocumentModel.instances[@id][@__internal__.instance]
+    delete DocumentModel.instances[@id]?[@__internal__.instance]
     delete DocumentModel.instances[@id] if Object.isEmpty(DocumentModel.instances[@id])
 
 
