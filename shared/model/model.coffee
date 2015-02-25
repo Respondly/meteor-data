@@ -30,6 +30,7 @@ Data.Model = class Model extends AutoRun
     # Store state.
     instanceCount += 1
     @__internal__.instance = instanceCount
+    @fields ?= schema.fields
     @db =
       isReactive: false
 
@@ -39,7 +40,6 @@ Data.Model = class Model extends AutoRun
         unless @db.schema
           # First time initialization.
           @db.schema = schema
-          @db.fields = schema.fields
           applySchema(@) if schema?
           applyModelRefs(@, overwrite:false)
         else
