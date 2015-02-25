@@ -3,18 +3,6 @@ Model = Data.Model
 
 
 
-###
-TODO
-
-- strip out fnFunc into it's own file.
-
-- TEST: db updates for sub-models.
-
-- remove other _fields
-
-###
-
-
 observers = {}
 observeCollection = (collection) ->
   name = collection._name
