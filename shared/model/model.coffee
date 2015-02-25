@@ -39,6 +39,7 @@ Data.Model = class Model extends AutoRun
         unless @db.schema
           # First time initialization.
           @db.schema = schema
+          @db.fields = schema.fields
           applySchema(@) if schema?
           applyModelRefs(@, overwrite:false)
         else

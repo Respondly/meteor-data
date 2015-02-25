@@ -164,6 +164,7 @@ describe 'Model', ->
         constructor: -> super null, schemaInstance
       foo = new Foo()
       expect(foo.db.schema.fields).to.equal schemaInstance.fields
+      expect(foo.db.fields).to.equal schemaInstance.fields
 
     it 'throw if schema-Type not passed', ->
       class NotSchema
