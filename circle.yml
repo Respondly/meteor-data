@@ -17,8 +17,4 @@ dependencies:
 
 test:
   override:
-    # HACK - some tests only fail on the first run (when NPM packages are downloaded etc.)
-    # Only the second run counts towards a success or failure
-    - PACKAGE_DIRS="..:$HOME" meteor test-packages --velocity respondly:data 2>&1 || true
-    - killallphantom || true
     - PACKAGE_DIRS="..:$HOME" meteor test-packages --velocity respondly:data 2>&1
