@@ -52,6 +52,7 @@ Data.DocumentModel = class DocumentModel extends Model
     @id = @_doc._id
     storeReference(@)
     @db.collection = collection
+    @db.collectionName = collection._name
     observeCollection(collection)
 
 

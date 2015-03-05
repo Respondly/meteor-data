@@ -38,6 +38,10 @@ describe 'DocumentModel constructor', ->
     stub = new Stub()
     expect(stub.db.collection).to.equal TestModels
 
+  it 'stores the collection name', ->
+    stub = new Stub()
+    expect(stub.db.collectionName).to.equal TestModels._name
+
   it 'stores the id', ->
     stub = new Stub({ _id:123 })
     expect(stub.id).to.equal 123
