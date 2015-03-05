@@ -33,7 +33,7 @@ Package.onUse(function (api) {
 
 
 Package.onTest(function (api) {
-  api.use(['mike:mocha-package@0.5.5', 'coffeescript']);
+  api.use(['mike:mocha-package@0.5.6', 'coffeescript']);
   api.use("insecure");
   api.use(['respondly:data', 'respondly:util']);
 
