@@ -147,19 +147,19 @@ describe 'Reactivity', ->
         expect(model.isDisposed).to.equal true
 
 
-    describe.skip 'changes when syncing from DB', ->
-      model1 = null
-      model2 = null
-      beforeEach ->
-        TestModel.deleteAll()
-        model1 = new MyModel().insertNew().reactive()
-        model2 = MyModel.find({_id:model1.id})[0].reactive()
-
-      it 'has not changes when DB is altered and there is not dirty value', (done) ->
-        model1.value('Yo', save:true)
-        Util.delay =>
-          expect(model2.value()).to.equal 'Yo'
-          console.log 'model1.changes()', model1.changes()
-          console.log 'model2.changes()', model2.changes()
-          done()
-
+    # TODO: add this back into the mix when skip is working properly
+    # describe.skip 'changes when syncing from DB', ->
+    #   model1 = null
+    #   model2 = null
+    #   beforeEach ->
+    #     TestModel.deleteAll()
+    #     model1 = new MyModel().insertNew().reactive()
+    #     model2 = MyModel.find({_id:model1.id})[0].reactive()
+    #
+    #   it 'has not changes when DB is altered and there is not dirty value', (done) ->
+    #     model1.value('Yo', save:true)
+    #     Util.delay =>
+    #       expect(model2.value()).to.equal 'Yo'
+    #       console.log 'model1.changes()', model1.changes()
+    #       console.log 'model2.changes()', model2.changes()
+    #       done()
