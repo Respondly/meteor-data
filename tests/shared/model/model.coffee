@@ -122,7 +122,6 @@ describe 'Model.toValues', ->
   it 'does not store fields starting with "_"', ->
     stub = new Stub()
     stub.__foo = 'My Foo'
-
     values = stub.toValues()
     expect(values._doc).to.equal undefined
     expect(values.__foo).to.equal undefined
@@ -140,18 +139,11 @@ describe 'Model.toValues', ->
     expect(values).to.eql { foo:123, child:'abc' }
 
 
-
   it 'does not fail when null/undefined field exists', ->
     stub = new Stub()
     stub.foo('My Value')
     stub.yo = null
     stub.toValues()
-
-
-
-
-
-
 
 
 # ----------------------------------------------------------------------
