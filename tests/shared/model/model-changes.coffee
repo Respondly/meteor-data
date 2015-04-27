@@ -125,13 +125,13 @@ describe 'changes method options', ->
 # ----------------------------------------------------------------------
 
 
-describe 'Model [changes] - reactivity', ->
+describe.client 'Model [changes] - reactivity', ->
   stub = null
   beforeEach -> stub = new Stub()
 
   it 'has reactive changes on Model (default of string)', (done) ->
     changes = undefined
-    Deps.autorun -> changes = stub.changes()
+    Tracker.autorun -> changes = stub.changes()
     stub.foo('new-foo')
     Util.delay =>
       expect(changes.foo.to).to.equal 'new-foo'
@@ -139,7 +139,7 @@ describe 'Model [changes] - reactivity', ->
 
   it 'has reactive changes on Model (default of string, undefined)', (done) ->
     changes = undefined
-    Deps.autorun -> changes = stub.changes()
+    Tracker.autorun -> changes = stub.changes()
     stub.myUndefined('yo')
     Util.delay =>
       expect(changes.myUndefined.to).to.equal 'yo'
@@ -148,7 +148,7 @@ describe 'Model [changes] - reactivity', ->
 
   it 'reactively resets changes to null when <prop>.delete() method is called', (done) ->
     changes = undefined
-    Deps.autorun -> changes = stub.changes()
+    Tracker.autorun -> changes = stub.changes()
     stub.myUndefined('foo')
     Util.delay =>
       expect(changes.myUndefined.from).to.equal undefined
@@ -163,7 +163,7 @@ describe 'Model [changes] - reactivity', ->
     changes = undefined
     stub.myUndefined('foo')
     stub.revertChanges()
-    Deps.autorun -> changes = stub.changes()
+    Tracker.autorun -> changes = stub.changes()
 
     expect(changes).to.equal null
     stub.text('yo')

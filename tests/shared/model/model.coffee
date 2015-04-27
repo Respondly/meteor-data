@@ -337,80 +337,82 @@ describe 'fields', ->
     expect(stub.mappedDeep()).to.equal 'my-value'
 
 
-  it 'reactively calls back when property is written to', (done) ->
-    stub = new Foo()
+  describe.client 'Reactivity', ->
 
-    count = 0
-    Deps.autorun ->
-      stub.foo(undefined, reactive:true) # Reactive dependency setup here.
-      count += 1
+    it 'reactively calls back when property is written to', (done) ->
+      stub = new Foo()
 
-    count = 0
-    stub.foo(123) # Change should cause the reactive callback.
+      count = 0
+      Tracker.autorun ->
+        stub.foo(undefined, reactive:true) # Reactive dependency setup here.
+        count += 1
 
-    Util.delay ->
-      expect(count).to.equal 1
-      done()
+      count = 0
+      stub.foo(123) # Change should cause the reactive callback.
 
-  it 'reactively calls back multiple times', (done) ->
-    stub = new Foo()
-
-    count = 0
-    Deps.autorun ->
-      stub.foo(undefined, reactive:true)
-      count += 1
-
-    count = 0
-    stub.foo(1)
-
-    Util.delay ->
-      stub.foo(1)
       Util.delay ->
-        expect(count).to.equal 2
+        expect(count).to.equal 1
+        done()
+
+    it 'reactively calls back multiple times', (done) ->
+      stub = new Foo()
+
+      count = 0
+      Tracker.autorun ->
+        stub.foo(undefined, reactive:true)
+        count += 1
+
+      count = 0
+      stub.foo(1)
+
+      Util.delay ->
+        stub.foo(1)
+        Util.delay ->
+          expect(count).to.equal 2
+          done()
+
+
+
+    it 'stops reactive callbacks', (done) ->
+      stub = new Foo()
+
+      count = 0
+      Tracker.autorun ->
+        stub.foo(undefined, reactive:true)
+        count += 1
+
+      count = 0
+      stub.foo.definition.stopReactive()
+      stub.foo(1)
+
+      Util.delay ->
+        expect(count).to.equal 0
         done()
 
 
+    it 'is reactive from from one read operation, but not another', (done) ->
+      stub = new Foo()
 
-  it 'stops reactive callbacks', (done) ->
-    stub = new Foo()
+      countReactive = 0
+      Tracker.autorun ->
+        stub.foo(undefined, reactive:true)
+        countReactive += 1
 
-    count = 0
-    Deps.autorun ->
-      stub.foo(undefined, reactive:true)
-      count += 1
+      countNonReactive = 0
+      Tracker.autorun ->
+        stub.foo(undefined, reactive:false)
+        stub.foo(undefined, reactive:null)
+        stub.foo()
+        countNonReactive += 1
 
-    count = 0
-    stub.foo.definition.stopReactive()
-    stub.foo(1)
+      countReactive = 0
+      countNonReactive = 0
+      stub.foo(1)
 
-    Util.delay ->
-      expect(count).to.equal 0
-      done()
-
-
-  it 'is reactive from from one read operation, but not another', (done) ->
-    stub = new Foo()
-
-    countReactive = 0
-    Deps.autorun ->
-      stub.foo(undefined, reactive:true)
-      countReactive += 1
-
-    countNonReactive = 0
-    Deps.autorun ->
-      stub.foo(undefined, reactive:false)
-      stub.foo(undefined, reactive:null)
-      stub.foo()
-      countNonReactive += 1
-
-    countReactive = 0
-    countNonReactive = 0
-    stub.foo(1)
-
-    Util.delay ->
-      expect(countReactive).to.equal 1
-      expect(countNonReactive).to.equal 0
-      done()
+      Util.delay ->
+        expect(countReactive).to.equal 1
+        expect(countNonReactive).to.equal 0
+        done()
 
 
 

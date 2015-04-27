@@ -93,12 +93,12 @@ describe 'SubModel: Changes', ->
 # ----------------------------------------------------------------------
 
 
-describe 'SubModel: Changes (Reactive)', ->
+describe.client 'SubModel: Changes (Reactive)', ->
   beforeEach -> initModels()
 
   it 'reactively changes sub-model', (done) ->
     changes = undefined
-    Deps.autorun -> changes = subModel.changes()
+    Tracker.autorun -> changes = subModel.changes()
     subModel.name('Phil')
     Util.delay =>
       expect(changes.name.from).to.equal 'My Name'
@@ -107,7 +107,7 @@ describe 'SubModel: Changes (Reactive)', ->
 
   it 'reactively reverts changes sub-model', (done) ->
     changes = undefined
-    Deps.autorun -> changes = subModel.changes()
+    Tracker.autorun -> changes = subModel.changes()
     subModel.name('Phil')
     Util.delay =>
       Util.delay =>
@@ -121,12 +121,12 @@ describe 'SubModel: Changes (Reactive)', ->
 # ----------------------------------------------------------------------
 
 
-describe 'SubModel: Parent Model Changes (Reactive)', ->
+describe.client 'SubModel: Parent Model Changes (Reactive)', ->
   beforeEach -> initModels()
 
   it 'reactively changes parent-model', (done) ->
     changes = undefined
-    Deps.autorun -> changes = model.changes()
+    Tracker.autorun -> changes = model.changes()
     subModel.name('Phil')
     Util.delay =>
       expect(changes.subModel.name.from).to.equal 'My Name'
@@ -136,7 +136,7 @@ describe 'SubModel: Parent Model Changes (Reactive)', ->
 
   it 'reactively reverts changes parent-model', (done) ->
     changes = undefined
-    Deps.autorun -> changes = model.changes()
+    Tracker.autorun -> changes = model.changes()
     subModel.name('Phil')
     Util.delay =>
       Util.delay =>
@@ -144,11 +144,3 @@ describe 'SubModel: Parent Model Changes (Reactive)', ->
         Util.delay =>
           expect(changes).to.equal null
           done()
-
-
-
-
-
-
-
-
