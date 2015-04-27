@@ -33,6 +33,8 @@ initStubs = ->
       constructor: (doc) ->
         super doc, ChildSchema
 
+      customMethod: -> 'custom-value'
+
 
 
 
@@ -101,6 +103,7 @@ describe 'Model.toValues', ->
     expect(values.child).to.equal 'abc'
     expect(values.base).to.equal 'overridden'
 
+
   it 'stores simple values', ->
     now = new Date()
     stub = new Stub()
@@ -119,11 +122,21 @@ describe 'Model.toValues', ->
   it 'does not store fields starting with "_"', ->
     stub = new Stub()
     stub.__foo = 'My Foo'
-
     values = stub.toValues()
     expect(values._doc).to.equal undefined
     expect(values.__foo).to.equal undefined
 
+
+  it 'returns value from a custom method', ->
+    stub = new Stub()
+    values = stub.toValues('customMethod')
+    expect(values.customMethod).to.equal 'custom-value'
+
+
+  it 'returns only the specified values', ->
+    stub = new Stub()
+    values = stub.toValues('foo', 'child')
+    expect(values).to.eql { foo:123, child:'abc' }
 
 
   it 'does not fail when null/undefined field exists', ->
@@ -131,8 +144,6 @@ describe 'Model.toValues', ->
     stub.foo('My Value')
     stub.yo = null
     stub.toValues()
-
-
 
 
 # ----------------------------------------------------------------------

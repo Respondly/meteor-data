@@ -229,6 +229,7 @@ Data.Model = class Model extends AutoRun
   ###
   toValues: (methodNames...) ->
     result = {}
+    methodNames = methodNames.flatten()
 
     isSimpleValue = (value) ->
             return true if Object.isString(value)
@@ -237,21 +238,29 @@ Data.Model = class Model extends AutoRun
             return true if Object.isDate(value)
             false
 
+    attachValue = (key, value) =>
+        if (value.def instanceof Data.FieldDefinition)
+          result[key] = @[key]()
+
+        else if isSimpleValue(value)
+          result[key] = value
+
+        else if Object.isFunction(value) and (methodNames.any (name) -> name is key)
+          result[key] = @[key]()
+
+
     for key, value of @
       continue unless value?
       continue if key.startsWith('_')
 
-      if (value.def instanceof Data.FieldDefinition)
-        result[key] = @[key]()
+      # Only add given method names if a set has been specified.
+      if methodNames.length > 0
+        continue unless methodNames.any(key)
 
-      else if isSimpleValue(value)
-        result[key] = value
-
-      else if Object.isFunction(value) and (methodNames.any (name) -> name is key)
-        result[key] = @[key]()
-
-      else if value.isSubModel and key isnt 'parentModel'
-        result[key] = value.toValues()
+      # Attach the value.
+      attachValue(key, value)
+      if value.isSubModel and key isnt 'parentModel'
+        result[key] = value.toValues(methodNames)
 
     result
 
@@ -626,6 +635,3 @@ readFilter = (model, field, value) ->
 
   # Finish up.
   value
-
-
-
