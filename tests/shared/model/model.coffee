@@ -24,10 +24,13 @@ initStubs = ->
         mappedUndefined: { field: 'deep.to.undefined',  default:undefined }
 
         mappedWithFunction:
-          field: (doc, value) ->
-            if value isnt undefined
-              doc.emails ?= []
-              doc.emails[0] = value
+          field: (doc, value, options = {}) ->
+            if options.delete
+              delete doc.emails = []
+            else
+              if value isnt undefined
+                doc.emails ?= []
+                doc.emails[0] = value
             doc.emails?[0]
 
 
@@ -345,22 +348,32 @@ describe 'fields', ->
     expect(stub.mappedDeep()).to.equal 'my-value'
 
 
+  describe 'Field defined as a function', ->
+    it 'reads from a field defined as a function', ->
+      stub = new Foo()
+      stub._doc.emails = ['hello@foo.com']
+      expect(stub.mappedWithFunction()).to.equal 'hello@foo.com'
 
-  it 'reads from a field defined as a function', ->
-    stub = new Foo()
-    stub._doc.emails = ['hello@foo.com']
-    expect(stub.mappedWithFunction()).to.equal 'hello@foo.com'
+    it 'writes to a field defined as a function', ->
+      stub = new Foo()
+      stub.mappedWithFunction('yo@yoddle.com')
+      expect(stub._doc.emails).to.eql ['yo@yoddle.com']
 
-  it 'write to a field defined as a function', ->
-    stub = new Foo()
-    stub.mappedWithFunction('yo@yoddle.com')
-    expect(stub._doc.emails).to.eql ['yo@yoddle.com']
+    it 'deletes a field defined as a function', ->
+      stub = new Foo()
+      stub.mappedWithFunction('phil@foo.com')
+      expect(Object.isArray(stub._doc.emails)).to.eql true
+      stub.mappedWithFunction.delete()
+      expect(stub._doc.emails).to.eql []
 
-  it 'causes `changed` to be updated when writing to field defined as a function', ->
-    stub = new Foo()
-    stub._doc.emails = ['hello@foo.com']
-    stub.mappedWithFunction('duh@foo.com')
-    expect(stub.changes().mappedWithFunction).to.eql { from:'hello@foo.com', to:'duh@foo.com' }
+    it 'causes `changed` to be updated when writing to field defined as a function', ->
+      stub = new Foo()
+      stub._doc.emails = ['hello@foo.com']
+      stub.mappedWithFunction('duh@foo.com')
+      expect(stub.changes().mappedWithFunction).to.eql { from:'hello@foo.com', to:'duh@foo.com' }
+
+
+  # ----------------------------------------------------------------------------
 
 
   describe.client 'Reactivity', ->

@@ -156,8 +156,11 @@ class Data.FieldDefinition
   Deletes the field from the document.
   ###
   delete: (doc) ->
-    target = docTarget(@field, doc)
-    delete target.obj[target.key]
+    if Object.isFunction(@field)
+      @field(doc, undefined, { delete:true })
+    else
+      target = docTarget(@field, doc)
+      delete target.obj[target.key]
 
 
 
