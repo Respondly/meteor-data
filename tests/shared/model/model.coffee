@@ -23,6 +23,16 @@ initStubs = ->
         mappedDeep:     { field: 'deep.to.path',  default:123 }
         mappedUndefined: { field: 'deep.to.undefined',  default:undefined }
 
+        mappedWithFunction:
+          field: (doc, value) ->
+            # console.log 'doc', doc
+            if value isnt undefined
+              doc.emails ?= []
+              doc.emails[0] = value
+            doc.emails?[0]
+
+
+
 
     class ChildSchema extends ParentSchema
       constructor: -> super
@@ -186,7 +196,6 @@ describe 'Schema', ->
     expect(foo.fields).to.equal 'hello'
 
 
-
 # ----------------------------------------------------------------------
 
 
@@ -337,8 +346,25 @@ describe 'fields', ->
     expect(stub.mappedDeep()).to.equal 'my-value'
 
 
-  describe.client 'Reactivity', ->
 
+  it 'reads from a field defined as a function', ->
+    stub = new Foo()
+    stub._doc.emails = ['hello@foo.com']
+    expect(stub.mappedWithFunction()).to.equal 'hello@foo.com'
+
+  it 'write to a field defined as a function', ->
+    stub = new Foo()
+    stub.mappedWithFunction('yo@yoddle.com')
+    expect(stub._doc.emails).to.eql ['yo@yoddle.com']
+
+  it 'causes `changed` to be updated when writing to field defined as a function', ->
+    stub = new Foo()
+    stub._doc.emails = ['hello@foo.com']
+    stub.mappedWithFunction('duh@foo.com')
+    expect(stub.changes().mappedWithFunction).to.eql { from:'hello@foo.com', to:'duh@foo.com' }
+
+
+  describe.client 'Reactivity', ->
     it 'reactively calls back when property is written to', (done) ->
       stub = new Foo()
 

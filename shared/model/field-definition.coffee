@@ -84,15 +84,21 @@ class Data.FieldDefinition
     useDefault = (options.useDefault ? true) is true
     reactive   = (options.reactive ? false) is true
 
-    unless mapTo.indexOf('.') > -1
-      # Shallow read.
-      value = doc[mapTo]
+    if Object.isFunction(mapTo)
+      # The field was defined as a function.
+      #     This allows for complex/arbitrary reading
+      #     from within the document.
+      value = mapTo(doc)
     else
-      # Deep read.
-      parts = mapTo.split('.')
-      key   = parts.last()
-      parts.removeAt(parts.length - 1)
-      value = Util.ns.get(doc, parts)[key]
+      unless mapTo.indexOf('.') > -1
+        # Shallow read.
+        value = doc[mapTo]
+      else
+        # Deep read.
+        parts = mapTo.split('.')
+        key   = parts.last()
+        parts.removeAt(parts.length - 1)
+        value = Util.ns.get(doc, parts)[key]
 
     # Type conversions.
     if @type?
@@ -123,7 +129,6 @@ class Data.FieldDefinition
   write: (doc, value) ->
     # Setup initial conditions.
     value  = @default if value is undefined
-    target = docTarget(@field, doc)
 
     # Type conversions.
     if @type?
@@ -132,7 +137,17 @@ class Data.FieldDefinition
         value = value.getTime()
 
     # Update the value.
-    target.obj[ target.key ] = value
+    if Object.isFunction(@field)
+      # The field was defined as a function.
+      #     This allows for complex/arbitrary writing
+      #     into the document, for instance into an array.
+      @field(doc, value)
+
+    else
+      target = docTarget(@field, doc)
+      target.obj[ target.key ] = value
+
+    # Finish up.
     @_deps?.changed()
 
 
@@ -167,8 +182,3 @@ docTarget = (field, doc) ->
       else
         target[part] ?= {}
         target = target[part]
-
-
-
-
-
