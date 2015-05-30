@@ -25,7 +25,6 @@ initStubs = ->
 
         mappedWithFunction:
           field: (doc, value) ->
-            # console.log 'doc', doc
             if value isnt undefined
               doc.emails ?= []
               doc.emails[0] = value
