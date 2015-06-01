@@ -195,6 +195,86 @@ describe 'DocumentModel: [insertNew] method', ->
     expect(Object.isDate(stub.myDate())).to.equal true
 
 
+# ----------------------------------------------------------------------------
+
+
+describe 'DocumentModel: field defined with a function', ->
+  class FuncFieldSchema extends Data.Schema
+    constructor: -> super
+      text: 'simple'
+      email:
+        field: (doc, value, options = {}) ->
+          if options.delete
+            delete doc.emails = []
+          else
+            if value isnt undefined
+              doc.emails ?= []
+              doc.emails[0] = value
+          doc.emails?[0]
+
+        update: (doc, changeSet) ->
+          changeSet.emails = doc.emails
+
+
+  class FuncFieldModel extends Data.DocumentModel
+    constructor: (doc) -> super doc, FuncFieldSchema, TestModels
+    @findOne: (id) -> new FuncFieldModel(TestModels.findOne(id))
+
+
+  it 'reads and writes to field', ->
+    model = new FuncFieldModel()
+    expect(model.email()).to.equal undefined
+    model.email('phil@foo.com')
+    expect(model.email()).to.equal 'phil@foo.com'
+    expect(model._doc.emails).to.eql ['phil@foo.com']
+
+  it 'registers changes', ->
+    model = new FuncFieldModel()
+    model.email('phil@foo.com')
+    expect(model.changes().email).to.eql { from:undefined, to:'phil@foo.com' }
+
+  it 'syncs changes', ->
+    model = new FuncFieldModel().insertNew()
+    model.syncChanges({ email: { to: 'phil@foo.com', from:undefined }})
+    expect(model.email()).to.equal 'phil@foo.com'
+    expect(model.changes().email.to).to.eql 'phil@foo.com'
+    expect(model.changes().email.from).to.eql undefined
+
+  it 'updates fields', ->
+    model = new FuncFieldModel().insertNew()
+    model.email('phil@foo.com')
+
+    model2 = FuncFieldModel.findOne(model.id)
+    expect(model2.email()).to.equal undefined
+
+    model.updateFields(model.fields.email)
+
+    model2 = FuncFieldModel.findOne(model.id)
+    expect(model2.email()).to.equal 'phil@foo.com'
+    expect(model2._doc.emails).to.eql ['phil@foo.com']
+
+  it 'saves changes', ->
+    model = new FuncFieldModel().insertNew()
+    model.email('phil@foo.com')
+    expect(model.changes()).not.to.equal null
+    model.saveChanges()
+
+    expect(model.changes()).to.equal null
+    expect(model.email()).to.equal 'phil@foo.com'
+
+    model2 = FuncFieldModel.findOne(model.id)
+    expect(model2.email()).to.equal 'phil@foo.com'
+    expect(model2._doc.emails).to.eql ['phil@foo.com']
+
+  it 'saves changes via the `save:true` property flag', ->
+    model = new FuncFieldModel()
+    model.email('phil@foo.com', save:true)
+    expect(model.email()).to.equal 'phil@foo.com'
+    expect(model.changes()).to.equal null
+
+
+
+# ----------------------------------------------------------------------------
 
 
 

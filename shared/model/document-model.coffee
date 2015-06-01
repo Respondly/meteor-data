@@ -138,25 +138,33 @@ Data.DocumentModel = class DocumentModel extends Model
         alreadyExists = fields.find (item) -> item.key is updatedAt.key
         unless alreadyExists
           @updatedAt +(new Date())
-          fields.add( updatedAt )
+          fields.add(updatedAt)
 
     # Build the change-set.
     change = {}
     for field in fields
       prop = @[field.key]
+
       if field.modelRef?
         # A referenced model. Pass the sub-document to be saved.
         value = prop._doc
       else
         # A property-func, read the value.
-        value = prop.apply(@)
-        value = +(value) if Object.isDate(value)
+        if Object.isFunction(field.field)
+          value = @_doc[field.key]
+        else
+          value = prop.apply(@)
+          value = +(value) if Object.isDate(value)
 
       # Run the [beforeSave] filter.
       value = beforeSaveFilter(@, field, value)
 
       # Store the value on the change-set
-      change[field.field] = value
+      if Object.isFunction(field.update)
+        field.update(@_doc, change)
+      else
+        key = if Object.isString(field.field) then field.field else field.key
+        change[key] = value
 
       # Remove from the model's "is-dirty" changes object.
       @changes(key:field.key, value:undefined)
@@ -201,6 +209,7 @@ Data.DocumentModel = class DocumentModel extends Model
   Saves the model's current change-set to the DB.
   ###
   saveChanges: -> @syncChanges(@changes(), save:true)
+
 
 
   ###
@@ -315,6 +324,3 @@ is invoked on any model.
 ###
 DocumentModel.beforeUpdateFields = (func) -> _beforeUpdateFields.push(func) if Object.isFunction(func)
 _beforeUpdateFields = []
-
-
-

@@ -11,6 +11,11 @@ class Data.FieldDefinition
     def    = definition
     @field = def?.field ? @key
 
+    # Function that can be on the schema definition to
+    # provide custom additions to the object that is passed
+    # to the mongo `$set` call when updating the field.
+    @update = def.update if Object.isFunction(def?.update)
+
     # Model-ref.
     if def?.modelRef?
       @modelRef = def.modelRef if Object.isFunction(def.modelRef)

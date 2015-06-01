@@ -348,7 +348,7 @@ describe 'fields', ->
     expect(stub.mappedDeep()).to.equal 'my-value'
 
 
-  describe 'Field defined as a function', ->
+  describe 'Field defined with a function', ->
     it 'reads from a field defined as a function', ->
       stub = new Foo()
       stub._doc.emails = ['hello@foo.com']
@@ -371,6 +371,7 @@ describe 'fields', ->
       stub._doc.emails = ['hello@foo.com']
       stub.mappedWithFunction('duh@foo.com')
       expect(stub.changes().mappedWithFunction).to.eql { from:'hello@foo.com', to:'duh@foo.com' }
+
 
 
   # ----------------------------------------------------------------------------
