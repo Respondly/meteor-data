@@ -11,7 +11,10 @@ Package.describe({
 Package.onUse(function (api) {
   // api.versionsFrom('1.0');
   api.use('coffeescript');
-  api.use('check');
+  api.use([
+    'check',
+    'tracker'
+  ]);
   api.use('respondly:util@1.0.1');
   api.export('Data');
 
@@ -34,7 +37,12 @@ Package.onUse(function (api) {
 
 Package.onTest(function (api) {
   api.use(['mike:mocha-package@0.5.7', 'coffeescript']);
-  api.use("insecure");
+  api.use([
+    'check',
+    'insecure',
+    'jquery',
+    'tracker'
+  ]);
   api.use(['respondly:data', 'respondly:util']);
 
   // Generated with: github.com/philcockfield/meteor-package-paths

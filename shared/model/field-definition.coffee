@@ -117,7 +117,7 @@ class Data.FieldDefinition
 
     # Setup reactive dependency (if required).
     if reactive
-      @_deps ?= new Deps.Dependency()
+      @_deps ?= new Tracker.Dependency()
       @_deps.depend()
 
     # Finish up.
